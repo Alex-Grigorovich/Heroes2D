@@ -94,7 +94,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: d837f60dfeef0d142a9519fb968a13cd, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -579,9 +579,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25ea5f304ce852548be9c059707e9216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  rotationSpeed: 10
-  rb: {fileID: 1284351885}
+  _MaxSpeed: 3.5
+  _acceleration: 50
+  _deceleration: 50
+  _velocityPower: 0.9
+  animator: {fileID: 1284351887}
 --- !u!61 &1284351884
 BoxCollider2D:
   m_ObjectHideFlags: 0
