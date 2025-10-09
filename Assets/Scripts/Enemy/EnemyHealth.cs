@@ -2,60 +2,67 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
+    [Header("Health Settings")]
     [SerializeField] private int _maxHealth = 100;
-    [SerializeField] private float _knockbackForce = 5f;
+    [SerializeField] private float _knockbackForce = 3f;
 
     private int _currentHealth;
     private Rigidbody2D _rb;
-    private Animator _animator;
+    private SpriteRenderer _sprite;
 
     void Start()
     {
         _currentHealth = _maxHealth;
         _rb = GetComponent<Rigidbody2D>();
-        _animator = GetComponent<Animator>();
+        _sprite = GetComponent<SpriteRenderer>();
+
+        // Автоматически ставим тег если забыли
+        if (!gameObject.CompareTag("Enemy"))
+        {
+            gameObject.tag = "Enemy";
+            Debug.Log($"Auto-assigned Enemy tag to {gameObject.name}");
+        }
     }
 
     public void TakeDamage(int damage, Vector2 attackDirection)
     {
+        // Проверяем компоненты
+        if (_sprite == null) _sprite = GetComponent<SpriteRenderer>();
+        if (_rb == null) _rb = GetComponent<Rigidbody2D>();
+
         _currentHealth -= damage;
 
-        // Анимация получения урона
-        if (_animator != null)
-        {
-            _animator.SetTrigger("TakeDamage");
-        }
+        Debug.Log($"{gameObject.name} took {damage} damage! Health: {_currentHealth}/{_maxHealth}");
 
-        // Отбрасывание
+        // Визуальная обратная связь
+        StartCoroutine(FlashRed());
+
+        // Отбрасывание (если есть Rigidbody)
         if (_rb != null)
         {
             _rb.AddForce(attackDirection * _knockbackForce, ForceMode2D.Impulse);
         }
 
-        // Проверка смерти
         if (_currentHealth <= 0)
         {
             Die();
         }
+    }
 
-        Debug.Log($"{gameObject.name} took {damage} damage. Health: {_currentHealth}/{_maxHealth}");
+    private System.Collections.IEnumerator FlashRed()
+    {
+        if (_sprite != null)
+        {
+            Color originalColor = _sprite.color;
+            _sprite.color = Color.red;
+            yield return new WaitForSeconds(0.2f);
+            _sprite.color = originalColor;
+        }
     }
 
     private void Die()
     {
-        // Анимация смерти
-        if (_animator != null)
-        {
-            _animator.SetBool("IsDead", true);
-        }
-
-        // Отключаем компоненты
-        if (_rb != null) _rb.simulated = false;
-        GetComponent<Collider2D>().enabled = false;
-
-        // Уничтожаем через 2 секунды
-        Destroy(gameObject, 2f);
-
         Debug.Log($"{gameObject.name} died!");
+        Destroy(gameObject);
     }
 }
