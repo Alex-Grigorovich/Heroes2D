@@ -537,8 +537,21 @@ MonoBehaviour:
   _obstacleLayer:
     serializedVersion: 2
     m_Bits: 1
-  _moveSpeed: 2
-  _stoppingDistance: 0.5
+  _moveSpeed: 1
+  _stoppingDistance: 0.25
+  _attackRange: 1.5
+  _attackCooldown: 2
+  _attackDamage: 5
+  _windupDuration: 0.3
+  _attackDelay: 0.6
+  _attackDuration: 0.2
+  _recoveryDuration: 0.5
+  _enemyZonePrefab: {fileID: 7299663328918109519, guid: 6127fb68bb3d36c4ea15337e87a95035, type: 3}
+  _enemyZoneDistance: 0.7
+  _enemyZoneShowDuration: 0.8
+  _enemyZoneRadius: 0.5
+  _playerHitColor: {r: 1, g: 0, b: 0, a: 1}
+  _hitFlashDuration: 0.4
 --- !u!114 &590376523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -552,7 +565,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 100
-  _knockbackForce: 5
+  _defense: 50
+  _deathEffect: {fileID: 0}
 --- !u!50 &590376528
 Rigidbody2D:
   serializedVersion: 4
@@ -565,7 +579,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 12.45
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 0
@@ -1352,18 +1366,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25ea5f304ce852548be9c059707e9216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _MaxSpeed: 3.5
+  _MaxSpeed: 5
   _acceleration: 50
   _deceleration: 50
   _velocityPower: 0.9
   _attackCooldown: 0.5
-  _attackDuration: 0.8
-  _attackDamage: 25
-  _attackRange: 1.5
+  _attackDuration: 1
+  _minDamage: 8
+  _maxDamage: 12
+  _attackRadius: 1.2
+  _attackAngle: 120
   _enemyLayer:
     serializedVersion: 2
     m_Bits: 512
-  _attackPoint: {fileID: 1831635525}
+  _targetingRadius: 3
+  _autoTargetClosestEnemy: 1
+  _targetSelectionRadius: 1.5
+  _showTargetingReticle: 1
+  _targetingReticlePrefab: {fileID: 0}
+  _attackRating: 100
+  _criticalChance: 0.05
+  _criticalMultiplier: 2
+  _canHitMultipleTargets: 1
+  _maxTargetsPerSwing: 3
+  _targetZonePrefab: {fileID: 7299663328918109519, guid: c6205b87dbfffbb43bf36f1426cd808a, type: 3}
+  _targetZoneDistance: 0.7
+  _targetZoneShowDuration: 0.8
+  _targetZoneRadius: 0.5
 --- !u!50 &1284351885
 Rigidbody2D:
   serializedVersion: 4

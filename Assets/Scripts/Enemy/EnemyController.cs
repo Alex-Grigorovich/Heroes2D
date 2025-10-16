@@ -1,4 +1,5 @@
-using UnityEngine;
+п»їusing UnityEngine;
+using System.Collections;
 
 public class EnemyController8Directions : MonoBehaviour
 {
@@ -9,31 +10,95 @@ public class EnemyController8Directions : MonoBehaviour
 
     [Header("Movement Settings")]
     [SerializeField] private float _moveSpeed = 2f;
-    [SerializeField] private float _stoppingDistance = 1f;
+    [SerializeField] private float _stoppingDistance = 1.2f;
+
+    [Header("Combat Settings")]
+    [SerializeField] private float _attackRange = 1.5f;
+    [SerializeField] private float _attackCooldown = 2f;
+    [SerializeField] private float _attackDamage = 25f;
+
+    [Header("Attack Timing")]
+    [SerializeField] private float _windupDuration = 0.3f;
+    [SerializeField] private float _attackDelay = 0.6f; // РџР°СѓР·Р° РїРµСЂРµРґ СѓСЂРѕРЅРѕРј
+    [SerializeField] private float _attackDuration = 0.2f;
+    [SerializeField] private float _recoveryDuration = 0.5f;
+
+    [Header("Enemy Zone Settings")]
+    [SerializeField] private GameObject _enemyZonePrefab;
+    [SerializeField] private float _enemyZoneDistance = 0.7f;
+    [SerializeField] private float _enemyZoneShowDuration = 0.8f;
+    [SerializeField] private float _enemyZoneRadius = 0.5f;
+
+    [Header("Visual Effects")]
+    [SerializeField] private Color _playerHitColor = Color.red;
+    [SerializeField] private float _hitFlashDuration = 0.4f;
 
     private Transform _player;
     private Rigidbody2D _rb;
     private Animator _animator;
+    private SpriteRenderer _playerSprite;
+    private Color _playerOriginalColor;
+
     private bool _isPlayerDetected = false;
-    private Vector2 _lastValidDirection = Vector2.down;
+    private bool _isAttacking = false;
+    private bool _shouldStopMoving = false;
+    private float _lastAttackTime = 0f;
+    private Vector2 _attackDirection = Vector2.down;
+
+    // Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ Р°С‚Р°РєРё РІСЂР°РіР°
+    private GameObject _enemyZoneInstance;
+    private SpriteRenderer _enemyZoneRenderer;
+    private bool _isDealingDamage = false;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
 
-        // Находим игрока по тегу
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
             _player = playerObject.transform;
+            _playerSprite = _player.GetComponent<SpriteRenderer>();
+            if (_playerSprite != null)
+            {
+                _playerOriginalColor = _playerSprite.color;
+            }
         }
 
-        // Настройка Rigidbody для 2D
         if (_rb != null)
         {
             _rb.gravityScale = 0f;
+            _rb.drag = 10f;
+            _rb.angularDrag = 10f;
             _rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј Enemy Zone
+        InitializeEnemyZone();
+    }
+
+    private void InitializeEnemyZone()
+    {
+        if (_enemyZonePrefab != null)
+        {
+            _enemyZoneInstance = Instantiate(_enemyZonePrefab, transform.position, Quaternion.identity);
+            _enemyZoneRenderer = _enemyZoneInstance.GetComponent<SpriteRenderer>();
+
+            if (_enemyZoneRenderer != null)
+            {
+                // РЎСЂР°Р·Сѓ СЃРєСЂС‹РІР°РµРј Р·РѕРЅСѓ Р°С‚Р°РєРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+                _enemyZoneRenderer.enabled = false;
+                Debug.Log("вњ… EnemyZone initialized and hidden");
+            }
+            else
+            {
+                Debug.LogWarning("вќЊ EnemyZone prefab doesn't have SpriteRenderer component!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("вќЊ EnemyZone prefab is not assigned!");
         }
     }
 
@@ -43,16 +108,62 @@ public class EnemyController8Directions : MonoBehaviour
 
         CheckForPlayer();
 
+        float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
+
         if (_isPlayerDetected)
         {
-            MoveTowardsPlayer();
+            bool shouldBeInAttackPosition = distanceToPlayer <= _attackRange;
+            bool reachedStoppingDistance = distanceToPlayer <= _stoppingDistance;
+
+            _shouldStopMoving = shouldBeInAttackPosition || reachedStoppingDistance;
+
+            if (shouldBeInAttackPosition && CanAttack() && !_isAttacking)
+            {
+                StopMovingImmediately();
+                StartAttack();
+            }
+            else if (!_shouldStopMoving && !_isAttacking)
+            {
+                MoveTowardsPlayer();
+            }
+            else if (!_isAttacking)
+            {
+                StopMovingImmediately();
+
+                if (shouldBeInAttackPosition && CanAttack())
+                {
+                    StartAttack();
+                }
+            }
         }
-        else
+        else if (!_isAttacking)
         {
-            StopMoving();
+            StopMovingImmediately();
+        }
+
+        // РџСЂРѕРІРµСЂСЏРµРј РїРѕРїР°РґР°РЅРёРµ РїРѕ РёРіСЂРѕРєСѓ РІ СЂРµР°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё, РєРѕРіРґР° РЅР°РЅРѕСЃРёС‚СЃСЏ СѓСЂРѕРЅ
+        if (_isDealingDamage && _enemyZoneRenderer != null && _enemyZoneRenderer.enabled)
+        {
+            CheckEnemyZoneDamage();
         }
 
         UpdateAnimation();
+    }
+
+    private void CheckEnemyZoneDamage()
+    {
+        // РС‰РµРј РёРіСЂРѕРєР° РІ СЂР°РґРёСѓСЃРµ EnemyZone
+        Collider2D playerInZone = Physics2D.OverlapCircle(
+            _enemyZoneInstance.transform.position,
+            _enemyZoneRadius,
+            _playerLayer
+        );
+
+        if (playerInZone != null && playerInZone.CompareTag("Player"))
+        {
+            DealDamageToPlayer();
+            _isDealingDamage = false; // РќР°РЅРѕСЃРёРј СѓСЂРѕРЅ С‚РѕР»СЊРєРѕ РѕРґРёРЅ СЂР°Р· Р·Р° Р°С‚Р°РєСѓ
+        }
     }
 
     void CheckForPlayer()
@@ -61,14 +172,12 @@ public class EnemyController8Directions : MonoBehaviour
 
         if (distanceToPlayer <= _detectionRange)
         {
-            // Проверяем, нет ли препятствий между врагом и игроком
             Vector2 directionToPlayer = (_player.position - transform.position).normalized;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, _detectionRange, _obstacleLayer);
 
             if (hit.collider == null || hit.collider.CompareTag("Player"))
             {
                 _isPlayerDetected = true;
-                _lastValidDirection = directionToPlayer; // Сохраняем корректное направление
             }
             else
             {
@@ -81,71 +190,197 @@ public class EnemyController8Directions : MonoBehaviour
         }
     }
 
-    void MoveTowardsPlayer()
+    bool CanAttack()
     {
-        Vector2 direction = (_player.position - transform.position).normalized;
-        float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
+        float timeSinceLastAttack = Time.time - _lastAttackTime;
+        return timeSinceLastAttack >= _attackCooldown;
+    }
 
-        // Сохраняем направление для анимации
-        _lastValidDirection = direction;
+    void StartAttack()
+    {
+        _isAttacking = true;
+        _lastAttackTime = Time.time;
 
-        // Двигаемся только если игрок вне радиуса остановки
-        if (distanceToPlayer > _stoppingDistance)
+        StopMovingImmediately();
+
+        _attackDirection = (_player.position - transform.position).normalized;
+        SetAttackDirection(_attackDirection);
+
+        _animator.SetBool("attack", true);
+        _animator.Update(0f);
+
+        StartCoroutine(AttackSequence());
+    }
+
+    private void ShowEnemyZone()
+    {
+        if (_enemyZoneRenderer != null && _enemyZoneInstance != null)
         {
-            Vector2 movement = direction * _moveSpeed;
+            // Р’С‹С‡РёСЃР»СЏРµРј РїРѕР·РёС†РёСЋ Р·РѕРЅС‹ Р°С‚Р°РєРё Р’РћРљР РЈР“ РІСЂР°РіР°
+            Vector3 enemyZonePosition = transform.position + (Vector3)_attackDirection * _enemyZoneDistance;
 
-            if (_rb != null)
-            {
-                _rb.velocity = movement;
-            }
-            else
-            {
-                transform.position = Vector2.MoveTowards(transform.position, _player.position, _moveSpeed * Time.deltaTime);
-            }
+            // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїРѕР·РёС†РёСЋ
+            _enemyZoneInstance.transform.position = enemyZonePosition;
+
+            // РџРѕРєР°Р·С‹РІР°РµРј Р·РѕРЅСѓ Р°С‚Р°РєРё
+            _enemyZoneRenderer.enabled = true;
+
+            Debug.Log($"рџЋЇ EnemyZone shown at position: {enemyZonePosition}");
         }
         else
         {
-            StopMoving();
+            Debug.LogWarning("вќЊ EnemyZone components are not properly initialized!");
         }
     }
 
-    void StopMoving()
+    private IEnumerator HideEnemyZoneAfterDelay()
+    {
+        yield return new WaitForSeconds(_enemyZoneShowDuration);
+
+        if (_enemyZoneRenderer != null)
+        {
+            _enemyZoneRenderer.enabled = false;
+            Debug.Log("рџЋЇ EnemyZone hidden");
+        }
+    }
+
+    void SetAttackDirection(Vector2 direction)
+    {
+        _animator.SetFloat("AttackX", direction.x);
+        _animator.SetFloat("AttackY", direction.y);
+    }
+
+    IEnumerator AttackSequence()
+    {
+        // Р¤Р°Р·Р° 1: Р—Р°РјР°С… (РїРѕРґРіРѕС‚РѕРІРєР° Рє Р°С‚Р°РєРµ)
+        Debug.Log("вљЎ Windup phase started");
+        yield return new WaitForSeconds(_windupDuration);
+
+        // Р¤Р°Р·Р° 2: РџР°СѓР·Р° РїРµСЂРµРґ СѓРґР°СЂРѕРј (РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ РґР»СЏ РёРіСЂРѕРєР°)
+        Debug.Log("вЏ° Attack delay - warning phase");
+        ShowEnemyZone(); // РџРѕРєР°Р·С‹РІР°РµРј Р·РѕРЅСѓ Р°С‚Р°РєРё РєР°Рє РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ
+        yield return new WaitForSeconds(_attackDelay);
+
+        // Р¤Р°Р·Р° 3: РЈРґР°СЂ - РЅР°С‡РёРЅР°РµРј РЅР°РЅРѕСЃРёС‚СЊ СѓСЂРѕРЅ С‡РµСЂРµР· EnemyZone
+        _isDealingDamage = true;
+        Debug.Log("рџ’Ґ START dealing damage phase with EnemyZone");
+
+        yield return new WaitForSeconds(_attackDuration);
+
+        // Р—Р°РєР°РЅС‡РёРІР°РµРј РЅР°РЅРѕСЃРёС‚СЊ СѓСЂРѕРЅ
+        _isDealingDamage = false;
+        Debug.Log("рџ’Ґ END dealing damage phase");
+
+        // РЎРєСЂС‹РІР°РµРј Р·РѕРЅСѓ Р°С‚Р°РєРё
+        StartCoroutine(HideEnemyZoneAfterDelay());
+
+        // Р¤Р°Р·Р° 4: Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ
+        yield return new WaitForSeconds(_recoveryDuration);
+
+        EndAttack();
+    }
+
+    void DealDamageToPlayer()
+    {
+        if (HealthSystem.Instance != null)
+        {
+            HealthSystem.Instance.TakeDamage(_attackDamage);
+            StartCoroutine(FlashPlayerOnHit());
+            Debug.Log($"рџ’Ґ Enemy dealt {_attackDamage} damage via EnemyZone!");
+        }
+    }
+
+    IEnumerator FlashPlayerOnHit()
+    {
+        if (_playerSprite != null)
+        {
+            Color originalColor = _playerSprite.color;
+            _playerSprite.color = _playerHitColor;
+            yield return new WaitForSeconds(_hitFlashDuration);
+            _playerSprite.color = originalColor;
+        }
+    }
+
+    void EndAttack()
+    {
+        _isAttacking = false;
+        _isDealingDamage = false;
+        _animator.SetBool("attack", false);
+        _animator.Update(0f);
+    }
+
+    void MoveTowardsPlayer()
+    {
+        _shouldStopMoving = false;
+
+        Vector2 direction = (_player.position - transform.position).normalized;
+
+        if (_rb != null)
+        {
+            _rb.velocity = direction * _moveSpeed;
+        }
+    }
+
+    void StopMovingImmediately()
     {
         if (_rb != null)
         {
             _rb.velocity = Vector2.zero;
         }
+        _shouldStopMoving = true;
     }
 
     void UpdateAnimation()
     {
         if (_animator == null) return;
 
-        Vector2 directionToPlayer = (_player.position - transform.position).normalized;
-        float currentSpeed = _isPlayerDetected ? _moveSpeed : 0f;
+        if (!_isAttacking)
+        {
+            Vector2 directionToPlayer = (_player.position - transform.position).normalized;
+            _animator.SetFloat("Horizontal", directionToPlayer.x);
+            _animator.SetFloat("Vertical", directionToPlayer.y);
 
-        // Всегда используем актуальное направление к игроку
-        _animator.SetFloat("Horizontal", directionToPlayer.x);
-        _animator.SetFloat("Vertical", directionToPlayer.y);
-        _animator.SetFloat("Speed", currentSpeed);
+            float currentSpeed = (_isPlayerDetected && !_shouldStopMoving && !_isAttacking) ? 1f : 0f;
+            _animator.SetFloat("Speed", currentSpeed);
+        }
+        else
+        {
+            _animator.SetFloat("Horizontal", _attackDirection.x);
+            _animator.SetFloat("Vertical", _attackDirection.y);
+            _animator.SetFloat("Speed", 0f);
+        }
     }
 
-    // Визуализация в редакторе
     private void OnDrawGizmosSelected()
     {
-        // Зона обнаружения
         Gizmos.color = _isPlayerDetected ? Color.red : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, _detectionRange);
 
-        // Радиус остановки
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, _stoppingDistance);
 
-        // Направление движения
-        if (Application.isPlaying)
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, _attackRange);
+
+        // Enemy Zone РІРёР·СѓР°Р»РёР·Р°С†РёСЏ
+        if (Application.isPlaying && _enemyZoneInstance != null && _enemyZoneRenderer != null && _enemyZoneRenderer.enabled)
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawRay(transform.position, _lastValidDirection * 2f);
+            Gizmos.color = _isDealingDamage ? Color.red : Color.yellow;
+            Gizmos.DrawWireSphere(_enemyZoneInstance.transform.position, _enemyZoneRadius);
+        }
+
+        if (Application.isPlaying && _isAttacking)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3)_attackDirection * _attackRange);
+
+            // РџРѕР·РёС†РёСЏ Enemy Zone
+            if (_enemyZoneInstance != null && _enemyZoneRenderer != null && _enemyZoneRenderer.enabled)
+            {
+                Gizmos.color = _isDealingDamage ? Color.red : Color.yellow;
+                Gizmos.DrawWireSphere(_enemyZoneInstance.transform.position, 0.1f);
+                Gizmos.DrawLine(transform.position, _enemyZoneInstance.transform.position);
+            }
         }
     }
 }
