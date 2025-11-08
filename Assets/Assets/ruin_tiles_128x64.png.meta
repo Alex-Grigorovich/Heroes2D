@@ -1,0 +1,1914 @@
+fileFormatVersion: 2
+guid: 3b732073beb38f3478f1ccb87b329474
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 500
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a2f9c0681cba1c40ab7680f015dca98
+      internalID: 1703477256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_1
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7df243b6f3db9e43851f976f1ada0f3
+      internalID: -1515595102
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_2
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 18a9a7a30113a8c4d9d5eaed8e11b74b
+      internalID: -455280388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_3
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2b7725399a699f488beccee0ec57c04
+      internalID: -1256781515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_4
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: a994b925c39cf8941b08cd2929cd36cf
+      internalID: -1774328471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_5
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85292779a28ae4445bebfb1ef9fd701d
+      internalID: 1290962444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_6
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5150c896b580fa47939e64c90f67e79
+      internalID: -1834281837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_7
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1993
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06a1b8f2c3c9ea149943d5246340edcc
+      internalID: -511530105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_8
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1709.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57cd5cbba5f5d424ea1b5f081188848a
+      internalID: 2121436828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_9
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 1709.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e6a0e27423f36f478029cb3f8ee7197
+      internalID: -956290556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_10
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 1709.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f30ca4510bf57c429620526f4e9d043
+      internalID: 1572460745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_11
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 1709.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc3c852bdf545e24f830d40abf8c839b
+      internalID: -337360582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_12
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 1709.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5718c31fd69170c4fa9cea3bd8458f21
+      internalID: -635338262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_13
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 1709.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1557d70d73621e4b8186723f28602ae
+      internalID: 1923626834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_14
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 1709.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba36c7f6939526e4c99e65f4842bee3e
+      internalID: -912826926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 754af06a876d4624eb327b82c4c7b9c8
+      internalID: 1668112761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_16
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93a9e4cbb0c9f4d49b85d30b1da63df6
+      internalID: -1496493518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_17
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8849c66686b70b4468502b211f19ad58
+      internalID: 99261119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_18
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: dcfdeb7773181b94aa3be7750c616af6
+      internalID: -534041284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_19
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4db5de83d97e8394c9b75b2977a3c23f
+      internalID: 1475285042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_20
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: e49b5df7b5ddcf3488871d60bc702f99
+      internalID: -352876410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_21
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3b52b4d17df57f4ab548a0e28d6a3d7
+      internalID: 877574498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_22
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1426
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 10063da196cf0904081c9d22b5b23067
+      internalID: 544691551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_23
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1142.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5aecd563882c2424baf064a349d0a3b4
+      internalID: -1049906958
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_24
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 1142.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: a9105b76b54327a4187a09a523f6bb1a
+      internalID: 173458774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_25
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 1142.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e46f81fee7ec484c87bb6ae7b3c1e64
+      internalID: -693761932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_26
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 1142.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80ab181a1296fd144ad045bd0024c255
+      internalID: 1243709405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_27
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 1142.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4457ce725519834e9fd91f3f9377e76
+      internalID: -1220483363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_28
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 1142.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 753020063677f8c49aaeddaf5bc78d49
+      internalID: -827201928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_29
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 1142.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b1a54d5cbe350546a5dfa4ad5c1e185
+      internalID: 36941992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e2013562ce798b4a995b18876c64594
+      internalID: -1344337894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_31
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 623b6944ed33a5a429d393298d96b398
+      internalID: -1145115998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_32
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3c23343abae26c4fa2d89580f3df0b5
+      internalID: 1360341291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_33
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06aa7f3c4a550774dba250ce23179e00
+      internalID: -1738721145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_34
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50f12de7b617d2445aaa2c2c0184fea3
+      internalID: 671809227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_35
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9dd7de508cf67b24c96fe3aac42cfa93
+      internalID: -666136387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_36
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac64ca36ad8b8f64e88dc3b3593ae4d7
+      internalID: 302055979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_37
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 859
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1456b84beb454ca4b9d11a9a249c9459
+      internalID: 1022537502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_38
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 575.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: e59d1e7baf59374458c9d76c664fa0e1
+      internalID: -1840121837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_39
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 575.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44f9ac3257019284eabe69a2c94a56b0
+      internalID: 1269559515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_40
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 575.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7e9166c6e6030a419f867d55203a8b9
+      internalID: -1916672219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_41
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 575.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 32485bb81fb176146b71a5a4ba7465d5
+      internalID: -624765629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_42
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 575.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: c57ce5060928a9543adf5acb361b77f9
+      internalID: -1835991808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_43
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 575.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 292a551317a22944e927efeb25a5d2d5
+      internalID: 1987194783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_44
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 575.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      physicsShape:
+      - - {x: 0, y: -258.5}
+        - {x: 127.5, y: 0}
+        - {x: 0, y: 258.5}
+        - {x: -127.5, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: ebf0972bff6f22a47ba2de2c572fd89a
+      internalID: 295480703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_45
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08778170dfa08c84c91f0e509106f91b
+      internalID: 1822140440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_46
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: f12c384e6d3bd9d4187f1df1122c0faa
+      internalID: 660614945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_47
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee92812d2872d744da63b71ae2c311aa
+      internalID: 1807626171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_48
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: eeebec8272ce1f64bb0813ec0890c24d
+      internalID: -495393010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_49
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6842d693ab906b84fa8dbc903dfab52e
+      internalID: -930565476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_50
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec470ba4facf6c14bb7492b13c485f46
+      internalID: 715124965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_51
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 327274e59bd147a4c8cf1a15b4f2014c
+      internalID: 276407849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_52
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 292
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5cfed370cb26734b9d7ed69d001129e
+      internalID: 740781148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_53
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 8.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50af958b49d87104785367b96bbf7094
+      internalID: -1719560984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_54
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 8.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 463cf4f6d1df8e84b861297f58c630cc
+      internalID: 112135651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_55
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 8.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: be8c40d3d73d9df43a58b878e8dec4f4
+      internalID: -1499339333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_56
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 8.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f4cb1f1c9904c24baf02b1c8f2a60b3
+      internalID: -1180480539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_57
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 8.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 125dad289dc0c434ea0e6b19f00932c0
+      internalID: -1902689459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_58
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 8.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: d16f7eedf0c36134db09c40ba0ed0553
+      internalID: 1755603821
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ruin_tiles_128x64_59
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 8.5
+        width: 256
+        height: 567
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      physicsShape:
+      - - {x: 0, y: -283.5}
+        - {x: 128, y: 0}
+        - {x: 0, y: 283.5}
+        - {x: -128, y: 0}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a10111f2a109404e9f7dba1a14836c7
+      internalID: 359903691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      ruin_tiles_128x64_0: 1703477256
+      ruin_tiles_128x64_1: -1515595102
+      ruin_tiles_128x64_10: 1572460745
+      ruin_tiles_128x64_11: -337360582
+      ruin_tiles_128x64_12: -635338262
+      ruin_tiles_128x64_13: 1923626834
+      ruin_tiles_128x64_14: -912826926
+      ruin_tiles_128x64_15: 1668112761
+      ruin_tiles_128x64_16: -1496493518
+      ruin_tiles_128x64_17: 99261119
+      ruin_tiles_128x64_18: -534041284
+      ruin_tiles_128x64_19: 1475285042
+      ruin_tiles_128x64_2: -455280388
+      ruin_tiles_128x64_20: -352876410
+      ruin_tiles_128x64_21: 877574498
+      ruin_tiles_128x64_22: 544691551
+      ruin_tiles_128x64_23: -1049906958
+      ruin_tiles_128x64_24: 173458774
+      ruin_tiles_128x64_25: -693761932
+      ruin_tiles_128x64_26: 1243709405
+      ruin_tiles_128x64_27: -1220483363
+      ruin_tiles_128x64_28: -827201928
+      ruin_tiles_128x64_29: 36941992
+      ruin_tiles_128x64_3: -1256781515
+      ruin_tiles_128x64_30: -1344337894
+      ruin_tiles_128x64_31: -1145115998
+      ruin_tiles_128x64_32: 1360341291
+      ruin_tiles_128x64_33: -1738721145
+      ruin_tiles_128x64_34: 671809227
+      ruin_tiles_128x64_35: -666136387
+      ruin_tiles_128x64_36: 302055979
+      ruin_tiles_128x64_37: 1022537502
+      ruin_tiles_128x64_38: -1840121837
+      ruin_tiles_128x64_39: 1269559515
+      ruin_tiles_128x64_4: -1774328471
+      ruin_tiles_128x64_40: -1916672219
+      ruin_tiles_128x64_41: -624765629
+      ruin_tiles_128x64_42: -1835991808
+      ruin_tiles_128x64_43: 1987194783
+      ruin_tiles_128x64_44: 295480703
+      ruin_tiles_128x64_45: 1822140440
+      ruin_tiles_128x64_46: 660614945
+      ruin_tiles_128x64_47: 1807626171
+      ruin_tiles_128x64_48: -495393010
+      ruin_tiles_128x64_49: -930565476
+      ruin_tiles_128x64_5: 1290962444
+      ruin_tiles_128x64_50: 715124965
+      ruin_tiles_128x64_51: 276407849
+      ruin_tiles_128x64_52: 740781148
+      ruin_tiles_128x64_53: -1719560984
+      ruin_tiles_128x64_54: 112135651
+      ruin_tiles_128x64_55: -1499339333
+      ruin_tiles_128x64_56: -1180480539
+      ruin_tiles_128x64_57: -1902689459
+      ruin_tiles_128x64_58: 1755603821
+      ruin_tiles_128x64_59: 359903691
+      ruin_tiles_128x64_6: -1834281837
+      ruin_tiles_128x64_7: -511530105
+      ruin_tiles_128x64_8: 2121436828
+      ruin_tiles_128x64_9: -956290556
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

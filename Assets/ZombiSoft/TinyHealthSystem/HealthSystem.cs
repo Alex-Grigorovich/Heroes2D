@@ -48,16 +48,15 @@ public class HealthSystem : MonoBehaviour
     //==============================================================
     void Awake()
     {
-        Instance = this;
-    }
-
-    //==============================================================
-    // Start
-    //==============================================================
-    void Start()
-    {
-        UpdateGraphics();
-        timeleft = regenUpdateInterval;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Опционально, если нужно сохранять между сценами
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     //==============================================================

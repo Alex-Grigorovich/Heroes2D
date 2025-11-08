@@ -152,17 +152,24 @@ public class EnemyController8Directions : MonoBehaviour
 
     private void CheckEnemyZoneDamage()
     {
-        // Ищем игрока в радиусе EnemyZone
-        Collider2D playerInZone = Physics2D.OverlapCircle(
+        if (_enemyZoneInstance == null || _enemyZoneRenderer == null || !_enemyZoneRenderer.enabled)
+            return;
+
+        // Используем более надежный метод обнаружения
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
             _enemyZoneInstance.transform.position,
             _enemyZoneRadius,
             _playerLayer
         );
 
-        if (playerInZone != null && playerInZone.CompareTag("Player"))
+        foreach (Collider2D hit in hits)
         {
-            DealDamageToPlayer();
-            _isDealingDamage = false; // Наносим урон только один раз за атаку
+            if (hit != null && hit.CompareTag("Player"))
+            {
+                DealDamageToPlayer();
+                _isDealingDamage = false;
+                break; // Наносим урон только одному игроку
+            }
         }
     }
 
@@ -173,15 +180,31 @@ public class EnemyController8Directions : MonoBehaviour
         if (distanceToPlayer <= _detectionRange)
         {
             Vector2 directionToPlayer = (_player.position - transform.position).normalized;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, _detectionRange, _obstacleLayer);
+            float distanceToPlayerDirect = Vector2.Distance(transform.position, _player.position);
 
-            if (hit.collider == null || hit.collider.CompareTag("Player"))
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position,
+                directionToPlayer,
+                distanceToPlayerDirect,
+                _obstacleLayer
+            );
+
+            Debug.DrawRay(transform.position, directionToPlayer * distanceToPlayerDirect, Color.red);
+
+            if (hit.collider == null)
             {
                 _isPlayerDetected = true;
+                Debug.Log("🎯 Player detected - no obstacles");
+            }
+            else if (hit.collider.CompareTag("Player"))
+            {
+                _isPlayerDetected = true;
+                Debug.Log("🎯 Player detected directly");
             }
             else
             {
                 _isPlayerDetected = false;
+                Debug.Log($"🚫 Player blocked by: {hit.collider.name}");
             }
         }
         else
@@ -383,4 +406,7 @@ public class EnemyController8Directions : MonoBehaviour
             }
         }
     }
+
+
+    
 }
