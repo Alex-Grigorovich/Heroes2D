@@ -45,6 +45,8 @@ public class PlayerCombatSystem : MonoBehaviour
     private Rigidbody2D _rigidbody;
     private Animator _animator;
     private Camera _mainCamera;
+    private SpriteRenderer _playerSpriteRenderer;
+    private Color _originalPlayerColor;
 
     // Входные данные
     private Vector2 _moveInput;
@@ -73,39 +75,18 @@ public class PlayerCombatSystem : MonoBehaviour
         _animator = GetComponent<Animator>();
         _rigidbody = GetComponent<Rigidbody2D>();
         _mainCamera = Camera.main;
+        _playerSpriteRenderer = GetComponent<SpriteRenderer>();
+
+        if (_playerSpriteRenderer != null)
+        {
+            _originalPlayerColor = _playerSpriteRenderer.color;
+        }
 
         // Создаем ретиклу наведения
         if (_showTargetingReticle && _targetingReticlePrefab != null)
         {
             _targetingReticle = Instantiate(_targetingReticlePrefab);
             _targetingReticle.SetActive(false);
-        }
-
-        // Создаем зону атаки
-        InitializeTargetZone();
-    }
-
-    private void InitializeTargetZone()
-    {
-        if (_targetZonePrefab != null)
-        {
-            _targetZoneInstance = Instantiate(_targetZonePrefab, transform.position, Quaternion.identity);
-            _targetZoneRenderer = _targetZoneInstance.GetComponent<SpriteRenderer>();
-
-            if (_targetZoneRenderer != null)
-            {
-                // Сразу скрываем зону атаки по умолчанию
-                _targetZoneRenderer.enabled = false;
-                Debug.Log("✅ TargetZone initialized and hidden");
-            }
-            else
-            {
-                Debug.LogWarning("❌ TargetZone prefab doesn't have SpriteRenderer component!");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("❌ TargetZone prefab is not assigned!");
         }
     }
 
@@ -119,7 +100,7 @@ public class PlayerCombatSystem : MonoBehaviour
         UpdateTargetingReticle();
 
         // Проверяем попадание по врагам в реальном времени, когда наносится урон
-        if (_isDealingDamage && _targetZoneRenderer != null && _targetZoneRenderer.enabled)
+        if (_isDealingDamage && _targetZoneInstance != null)
         {
             CheckTargetZoneDamage();
         }
@@ -127,6 +108,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void CheckTargetZoneDamage()
     {
+        if (_targetZoneInstance == null) return;
+
         // Ищем всех врагов в радиусе TargetZone
         Collider2D[] enemiesInZone = Physics2D.OverlapCircleAll(
             _targetZoneInstance.transform.position,
@@ -272,46 +255,51 @@ public class PlayerCombatSystem : MonoBehaviour
 
         _animator.SetBool("IsAttacking", true);
 
-        // Показываем зону атаки в направлении удара
-        ShowTargetZone();
+        // Создаем и показываем зону атаки в направлении удара
+        CreateTargetZone();
 
         StartCoroutine(AttackSequence());
 
         Debug.Log($"🎯 Attack started! Direction: {_attackDirection}");
     }
 
-    private void ShowTargetZone()
+    private void CreateTargetZone()
     {
-        if (_targetZoneRenderer != null && _targetZoneInstance != null)
+        if (_targetZonePrefab != null)
         {
+            // Уничтожаем старую зону, если она есть
+            DestroyTargetZone();
+
             // Вычисляем позицию зоны атаки ВОКРУГ персонажа
             Vector3 targetZonePosition = transform.position + (Vector3)_attackDirection * _targetZoneDistance;
 
-            // Устанавливаем позицию
-            _targetZoneInstance.transform.position = targetZonePosition;
+            // Создаем новую зону атаки
+            _targetZoneInstance = Instantiate(_targetZonePrefab, targetZonePosition, Quaternion.identity);
+            _targetZoneRenderer = _targetZoneInstance.GetComponent<SpriteRenderer>();
 
-            // Показываем зону атаки
-            _targetZoneRenderer.enabled = true;
-
-            Debug.Log($"🎯 TargetZone shown at position: {targetZonePosition}");
-
-            // Запускаем корутину для скрытия зоны атаки через указанное время
-            StartCoroutine(HideTargetZoneAfterDelay());
+            if (_targetZoneRenderer != null)
+            {
+                Debug.Log($"🎯 TargetZone created at position: {targetZonePosition}");
+            }
+            else
+            {
+                Debug.LogWarning("❌ TargetZone prefab doesn't have SpriteRenderer component!");
+            }
         }
         else
         {
-            Debug.LogWarning("❌ TargetZone components are not properly initialized!");
+            Debug.LogWarning("❌ TargetZone prefab is not assigned!");
         }
     }
 
-    private IEnumerator HideTargetZoneAfterDelay()
+    private void DestroyTargetZone()
     {
-        yield return new WaitForSeconds(_targetZoneShowDuration);
-
-        if (_targetZoneRenderer != null)
+        if (_targetZoneInstance != null)
         {
-            _targetZoneRenderer.enabled = false;
-            Debug.Log("🎯 TargetZone hidden");
+            Destroy(_targetZoneInstance);
+            _targetZoneInstance = null;
+            _targetZoneRenderer = null;
+            Debug.Log("🎯 TargetZone destroyed");
         }
     }
 
@@ -330,6 +318,9 @@ public class PlayerCombatSystem : MonoBehaviour
         // Заканчиваем наносить урон
         _isDealingDamage = false;
         Debug.Log("💥 END dealing damage phase");
+
+        // Уничтожаем зону атаки
+        DestroyTargetZone();
 
         // Завершаем атаку
         yield return new WaitForSeconds(_attackDuration * 0.4f);
@@ -403,6 +394,9 @@ public class PlayerCombatSystem : MonoBehaviour
     {
         StartCoroutine(FlashEnemy(position, isCritical));
         CreateDamagePopup(position, damage, isCritical);
+
+        // УБРАЛИ мигание персонажа - оно не нужно для игрока при атаке
+        // FlashPlayer();
     }
 
     private IEnumerator FlashEnemy(Vector3 position, bool isCritical)
@@ -458,6 +452,17 @@ public class PlayerCombatSystem : MonoBehaviour
 
         // Очищаем список поврежденных врагов при завершении атаки
         _alreadyDamagedEnemies.Clear();
+
+        // Убеждаемся, что цвет игрока сброшен (на всякий случай)
+        ResetPlayerColor();
+    }
+
+    private void ResetPlayerColor()
+    {
+        if (_playerSpriteRenderer != null)
+        {
+            _playerSpriteRenderer.color = _originalPlayerColor;
+        }
     }
 
     private void UpdateAnimation()
@@ -528,6 +533,19 @@ public class PlayerCombatSystem : MonoBehaviour
         }
     }
 
+    // Добавляем методы для управления жизненным циклом
+    private void OnDestroy()
+    {
+        DestroyTargetZone();
+        ResetPlayerColor();
+    }
+
+    private void OnDisable()
+    {
+        DestroyTargetZone();
+        ResetPlayerColor();
+    }
+
     // Визуализация в редакторе
     private void OnDrawGizmosSelected()
     {
@@ -540,7 +558,7 @@ public class PlayerCombatSystem : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, _targetingRadius);
 
         // Радиус TargetZone (зона поражения)
-        if (Application.isPlaying && _targetZoneInstance != null && _targetZoneRenderer != null && _targetZoneRenderer.enabled)
+        if (Application.isPlaying && _targetZoneInstance != null)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(_targetZoneInstance.transform.position, _targetZoneRadius);
@@ -568,7 +586,7 @@ public class PlayerCombatSystem : MonoBehaviour
         }
 
         // Позиция TargetZone
-        if (Application.isPlaying && _targetZoneInstance != null && _targetZoneRenderer != null && _targetZoneRenderer.enabled)
+        if (Application.isPlaying && _targetZoneInstance != null)
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(_targetZoneInstance.transform.position, 0.1f);

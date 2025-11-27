@@ -50,6 +50,10 @@ public class EnemyController8Directions : MonoBehaviour
     private SpriteRenderer _enemyZoneRenderer;
     private bool _isDealingDamage = false;
 
+    // Для управления миганием игрока
+    private Coroutine _flashCoroutine;
+    private bool _isFlashing = false;
+
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -72,33 +76,6 @@ public class EnemyController8Directions : MonoBehaviour
             _rb.drag = 10f;
             _rb.angularDrag = 10f;
             _rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        }
-
-        // Инициализируем Enemy Zone
-        InitializeEnemyZone();
-    }
-
-    private void InitializeEnemyZone()
-    {
-        if (_enemyZonePrefab != null)
-        {
-            _enemyZoneInstance = Instantiate(_enemyZonePrefab, transform.position, Quaternion.identity);
-            _enemyZoneRenderer = _enemyZoneInstance.GetComponent<SpriteRenderer>();
-
-            if (_enemyZoneRenderer != null)
-            {
-                // Сразу скрываем зону атаки по умолчанию
-                _enemyZoneRenderer.enabled = false;
-                Debug.Log("✅ EnemyZone initialized and hidden");
-            }
-            else
-            {
-                Debug.LogWarning("❌ EnemyZone prefab doesn't have SpriteRenderer component!");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("❌ EnemyZone prefab is not assigned!");
         }
     }
 
@@ -142,7 +119,7 @@ public class EnemyController8Directions : MonoBehaviour
         }
 
         // Проверяем попадание по игроку в реальном времени, когда наносится урон
-        if (_isDealingDamage && _enemyZoneRenderer != null && _enemyZoneRenderer.enabled)
+        if (_isDealingDamage && _enemyZoneInstance != null)
         {
             CheckEnemyZoneDamage();
         }
@@ -152,7 +129,7 @@ public class EnemyController8Directions : MonoBehaviour
 
     private void CheckEnemyZoneDamage()
     {
-        if (_enemyZoneInstance == null || _enemyZoneRenderer == null || !_enemyZoneRenderer.enabled)
+        if (_enemyZoneInstance == null)
             return;
 
         // Используем более надежный метод обнаружения
@@ -194,17 +171,14 @@ public class EnemyController8Directions : MonoBehaviour
             if (hit.collider == null)
             {
                 _isPlayerDetected = true;
-                Debug.Log("🎯 Player detected - no obstacles");
             }
             else if (hit.collider.CompareTag("Player"))
             {
                 _isPlayerDetected = true;
-                Debug.Log("🎯 Player detected directly");
             }
             else
             {
                 _isPlayerDetected = false;
-                Debug.Log($"🚫 Player blocked by: {hit.collider.name}");
             }
         }
         else
@@ -235,35 +209,40 @@ public class EnemyController8Directions : MonoBehaviour
         StartCoroutine(AttackSequence());
     }
 
-    private void ShowEnemyZone()
+    private void CreateEnemyZone()
     {
-        if (_enemyZoneRenderer != null && _enemyZoneInstance != null)
+        if (_enemyZonePrefab != null)
         {
             // Вычисляем позицию зоны атаки ВОКРУГ врага
             Vector3 enemyZonePosition = transform.position + (Vector3)_attackDirection * _enemyZoneDistance;
 
-            // Устанавливаем позицию
-            _enemyZoneInstance.transform.position = enemyZonePosition;
+            // Создаем новую зону атаки
+            _enemyZoneInstance = Instantiate(_enemyZonePrefab, enemyZonePosition, Quaternion.identity);
+            _enemyZoneRenderer = _enemyZoneInstance.GetComponent<SpriteRenderer>();
 
-            // Показываем зону атаки
-            _enemyZoneRenderer.enabled = true;
-
-            Debug.Log($"🎯 EnemyZone shown at position: {enemyZonePosition}");
+            if (_enemyZoneRenderer != null)
+            {
+                Debug.Log($"🎯 EnemyZone created at position: {enemyZonePosition}");
+            }
+            else
+            {
+                Debug.LogWarning("❌ EnemyZone prefab doesn't have SpriteRenderer component!");
+            }
         }
         else
         {
-            Debug.LogWarning("❌ EnemyZone components are not properly initialized!");
+            Debug.LogWarning("❌ EnemyZone prefab is not assigned!");
         }
     }
 
-    private IEnumerator HideEnemyZoneAfterDelay()
+    private void DestroyEnemyZone()
     {
-        yield return new WaitForSeconds(_enemyZoneShowDuration);
-
-        if (_enemyZoneRenderer != null)
+        if (_enemyZoneInstance != null)
         {
-            _enemyZoneRenderer.enabled = false;
-            Debug.Log("🎯 EnemyZone hidden");
+            Destroy(_enemyZoneInstance);
+            _enemyZoneInstance = null;
+            _enemyZoneRenderer = null;
+            Debug.Log("🎯 EnemyZone destroyed");
         }
     }
 
@@ -281,7 +260,10 @@ public class EnemyController8Directions : MonoBehaviour
 
         // Фаза 2: Пауза перед ударом (предупреждение для игрока)
         Debug.Log("⏰ Attack delay - warning phase");
-        ShowEnemyZone(); // Показываем зону атаки как предупреждение
+
+        // Создаем EnemyZone как предупреждение
+        CreateEnemyZone();
+
         yield return new WaitForSeconds(_attackDelay);
 
         // Фаза 3: Удар - начинаем наносить урон через EnemyZone
@@ -294,8 +276,8 @@ public class EnemyController8Directions : MonoBehaviour
         _isDealingDamage = false;
         Debug.Log("💥 END dealing damage phase");
 
-        // Скрываем зону атаки
-        StartCoroutine(HideEnemyZoneAfterDelay());
+        // Уничтожаем зону атаки сразу после фазы удара
+        DestroyEnemyZone();
 
         // Фаза 4: Восстановление
         yield return new WaitForSeconds(_recoveryDuration);
@@ -308,20 +290,44 @@ public class EnemyController8Directions : MonoBehaviour
         if (HealthSystem.Instance != null)
         {
             HealthSystem.Instance.TakeDamage(_attackDamage);
-            StartCoroutine(FlashPlayerOnHit());
+            FlashPlayerOnHit();
             Debug.Log($"💥 Enemy dealt {_attackDamage} damage via EnemyZone!");
         }
     }
 
-    IEnumerator FlashPlayerOnHit()
+    void FlashPlayerOnHit()
     {
-        if (_playerSprite != null)
+        if (_playerSprite != null && !_isFlashing)
         {
-            Color originalColor = _playerSprite.color;
-            _playerSprite.color = _playerHitColor;
-            yield return new WaitForSeconds(_hitFlashDuration);
-            _playerSprite.color = originalColor;
+            // Останавливаем предыдущую корутину, если она есть
+            if (_flashCoroutine != null)
+            {
+                StopCoroutine(_flashCoroutine);
+            }
+            _flashCoroutine = StartCoroutine(FlashPlayerCoroutine());
         }
+    }
+
+    private IEnumerator FlashPlayerCoroutine()
+    {
+        if (_playerSprite == null) yield break;
+
+        _isFlashing = true;
+
+        // Сохраняем текущий цвет
+        Color currentColor = _playerSprite.color;
+
+        // Меняем цвет на красный
+        _playerSprite.color = _playerHitColor;
+
+        // Ждем указанное время
+        yield return new WaitForSeconds(_hitFlashDuration);
+
+        // Возвращаем оригинальный цвет
+        _playerSprite.color = _playerOriginalColor;
+
+        _isFlashing = false;
+        _flashCoroutine = null;
     }
 
     void EndAttack()
@@ -330,6 +336,28 @@ public class EnemyController8Directions : MonoBehaviour
         _isDealingDamage = false;
         _animator.SetBool("attack", false);
         _animator.Update(0f);
+
+        // На всякий случай уничтожаем зону атаки при завершении атаки
+        DestroyEnemyZone();
+
+        // Гарантируем, что цвет игрока сброшен
+        ResetPlayerColor();
+    }
+
+    private void ResetPlayerColor()
+    {
+        if (_playerSprite != null)
+        {
+            _playerSprite.color = _playerOriginalColor;
+        }
+
+        // Останавливаем корутину мигания
+        if (_flashCoroutine != null)
+        {
+            StopCoroutine(_flashCoroutine);
+            _flashCoroutine = null;
+        }
+        _isFlashing = false;
     }
 
     void MoveTowardsPlayer()
@@ -374,6 +402,19 @@ public class EnemyController8Directions : MonoBehaviour
         }
     }
 
+    // Добавляем методы для управления жизненным циклом
+    private void OnDestroy()
+    {
+        ResetPlayerColor();
+        DestroyEnemyZone();
+    }
+
+    private void OnDisable()
+    {
+        ResetPlayerColor();
+        DestroyEnemyZone();
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = _isPlayerDetected ? Color.red : Color.yellow;
@@ -386,7 +427,7 @@ public class EnemyController8Directions : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, _attackRange);
 
         // Enemy Zone визуализация
-        if (Application.isPlaying && _enemyZoneInstance != null && _enemyZoneRenderer != null && _enemyZoneRenderer.enabled)
+        if (Application.isPlaying && _enemyZoneInstance != null)
         {
             Gizmos.color = _isDealingDamage ? Color.red : Color.yellow;
             Gizmos.DrawWireSphere(_enemyZoneInstance.transform.position, _enemyZoneRadius);
@@ -398,7 +439,7 @@ public class EnemyController8Directions : MonoBehaviour
             Gizmos.DrawLine(transform.position, transform.position + (Vector3)_attackDirection * _attackRange);
 
             // Позиция Enemy Zone
-            if (_enemyZoneInstance != null && _enemyZoneRenderer != null && _enemyZoneRenderer.enabled)
+            if (_enemyZoneInstance != null)
             {
                 Gizmos.color = _isDealingDamage ? Color.red : Color.yellow;
                 Gizmos.DrawWireSphere(_enemyZoneInstance.transform.position, 0.1f);
@@ -406,7 +447,4 @@ public class EnemyController8Directions : MonoBehaviour
             }
         }
     }
-
-
-    
 }
