@@ -444,6 +444,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8654437013311993139}
     m_Modifications:
+    - target: {fileID: 1972403612382538874, guid: f7162b84863baba4bafb2589864e6802, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1972403612696060435, guid: f7162b84863baba4bafb2589864e6802, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -500,6 +504,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -40.2
       objectReference: {fileID: 0}
+    - target: {fileID: 5510382441765092197, guid: f7162b84863baba4bafb2589864e6802, type: 3}
+      propertyPath: playerAnimator
+      value: 
+      objectReference: {fileID: 5904414318898432411}
     - target: {fileID: 5510382441765092198, guid: f7162b84863baba4bafb2589864e6802, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -585,6 +593,10 @@ PrefabInstance:
       value: TinyHealthSystem
       objectReference: {fileID: 0}
     - target: {fileID: 5510382441765092199, guid: f7162b84863baba4bafb2589864e6802, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5510382442210418569, guid: f7162b84863baba4bafb2589864e6802, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}

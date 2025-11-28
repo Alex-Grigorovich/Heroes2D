@@ -372,7 +372,7 @@ TextureImporter:
       213: 8676406376118417166
     second: Die_122
   externalObjects: {}
-  serializedVersion: 12
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -446,6 +446,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -458,6 +459,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -467,10 +469,10 @@ TextureImporter:
       name: Die_0
       rect:
         serializedVersion: 2
-        x: 44
-        y: 911
-        width: 50
-        height: 69
+        x: 0
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -488,10 +490,10 @@ TextureImporter:
       name: Die_1
       rect:
         serializedVersion: 2
-        x: 179
-        y: 913
-        width: 40
-        height: 64
+        x: 128
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -509,10 +511,10 @@ TextureImporter:
       name: Die_2
       rect:
         serializedVersion: 2
-        x: 307
-        y: 917
-        width: 44
-        height: 60
+        x: 256
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -530,10 +532,10 @@ TextureImporter:
       name: Die_3
       rect:
         serializedVersion: 2
-        x: 435
-        y: 918
-        width: 44
-        height: 59
+        x: 384
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -551,10 +553,10 @@ TextureImporter:
       name: Die_4
       rect:
         serializedVersion: 2
-        x: 564
-        y: 917
-        width: 43
-        height: 63
+        x: 512
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -572,10 +574,10 @@ TextureImporter:
       name: Die_5
       rect:
         serializedVersion: 2
-        x: 695
-        y: 916
-        width: 43
-        height: 59
+        x: 640
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -593,10 +595,10 @@ TextureImporter:
       name: Die_6
       rect:
         serializedVersion: 2
-        x: 825
-        y: 915
-        width: 44
-        height: 53
+        x: 768
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -614,10 +616,10 @@ TextureImporter:
       name: Die_7
       rect:
         serializedVersion: 2
-        x: 862
-        y: 929
-        width: 11
-        height: 7
+        x: 896
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -635,10 +637,10 @@ TextureImporter:
       name: Die_8
       rect:
         serializedVersion: 2
-        x: 953
-        y: 920
-        width: 51
-        height: 48
+        x: 1024
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -656,10 +658,10 @@ TextureImporter:
       name: Die_9
       rect:
         serializedVersion: 2
-        x: 1081
-        y: 920
-        width: 50
-        height: 51
+        x: 1152
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -677,10 +679,10 @@ TextureImporter:
       name: Die_10
       rect:
         serializedVersion: 2
-        x: 1206
-        y: 920
-        width: 53
-        height: 53
+        x: 1280
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -698,10 +700,10 @@ TextureImporter:
       name: Die_11
       rect:
         serializedVersion: 2
-        x: 1327
-        y: 919
-        width: 61
-        height: 49
+        x: 1408
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -719,10 +721,10 @@ TextureImporter:
       name: Die_12
       rect:
         serializedVersion: 2
-        x: 1449
-        y: 916
-        width: 69
-        height: 48
+        x: 1536
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -740,10 +742,10 @@ TextureImporter:
       name: Die_13
       rect:
         serializedVersion: 2
-        x: 1565
-        y: 905
-        width: 93
-        height: 55
+        x: 1664
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -761,10 +763,10 @@ TextureImporter:
       name: Die_14
       rect:
         serializedVersion: 2
-        x: 1690
-        y: 909
-        width: 95
-        height: 55
+        x: 1792
+        y: 896
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -782,10 +784,10 @@ TextureImporter:
       name: Die_15
       rect:
         serializedVersion: 2
-        x: 1816
-        y: 911
-        width: 88
-        height: 51
+        x: 0
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -803,10 +805,10 @@ TextureImporter:
       name: Die_16
       rect:
         serializedVersion: 2
-        x: 41
-        y: 778
-        width: 51
-        height: 69
+        x: 128
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -824,10 +826,10 @@ TextureImporter:
       name: Die_17
       rect:
         serializedVersion: 2
-        x: 169
-        y: 781
-        width: 51
-        height: 63
+        x: 256
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -845,10 +847,10 @@ TextureImporter:
       name: Die_18
       rect:
         serializedVersion: 2
-        x: 303
-        y: 784
-        width: 42
-        height: 61
+        x: 384
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -866,10 +868,10 @@ TextureImporter:
       name: Die_19
       rect:
         serializedVersion: 2
-        x: 428
-        y: 789
-        width: 48
-        height: 54
+        x: 512
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -887,10 +889,10 @@ TextureImporter:
       name: Die_20
       rect:
         serializedVersion: 2
-        x: 447
-        y: 783
-        width: 13
-        height: 8
+        x: 640
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -908,10 +910,10 @@ TextureImporter:
       name: Die_21
       rect:
         serializedVersion: 2
-        x: 554
-        y: 784
-        width: 51
-        height: 65
+        x: 768
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -929,10 +931,10 @@ TextureImporter:
       name: Die_22
       rect:
         serializedVersion: 2
-        x: 684
-        y: 786
-        width: 50
-        height: 58
+        x: 896
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -950,10 +952,10 @@ TextureImporter:
       name: Die_23
       rect:
         serializedVersion: 2
-        x: 818
-        y: 786
-        width: 46
-        height: 47
+        x: 1024
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -971,10 +973,10 @@ TextureImporter:
       name: Die_24
       rect:
         serializedVersion: 2
-        x: 947
-        y: 778
-        width: 49
-        height: 52
+        x: 1152
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -992,10 +994,10 @@ TextureImporter:
       name: Die_25
       rect:
         serializedVersion: 2
-        x: 1075
-        y: 779
-        width: 51
-        height: 49
+        x: 1280
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1013,10 +1015,10 @@ TextureImporter:
       name: Die_26
       rect:
         serializedVersion: 2
-        x: 1201
-        y: 779
-        width: 50
-        height: 55
+        x: 1408
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1034,10 +1036,10 @@ TextureImporter:
       name: Die_27
       rect:
         serializedVersion: 2
-        x: 1325
-        y: 781
-        width: 54
-        height: 49
+        x: 1536
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1055,10 +1057,10 @@ TextureImporter:
       name: Die_28
       rect:
         serializedVersion: 2
-        x: 1452
-        y: 770
-        width: 58
-        height: 54
+        x: 1664
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1076,10 +1078,10 @@ TextureImporter:
       name: Die_29
       rect:
         serializedVersion: 2
-        x: 1570
-        y: 767
-        width: 77
-        height: 67
+        x: 1792
+        y: 768
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1097,10 +1099,10 @@ TextureImporter:
       name: Die_30
       rect:
         serializedVersion: 2
-        x: 1693
-        y: 767
-        width: 84
-        height: 66
+        x: 0
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1118,10 +1120,10 @@ TextureImporter:
       name: Die_31
       rect:
         serializedVersion: 2
-        x: 1819
-        y: 767
-        width: 83
-        height: 67
+        x: 128
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1139,10 +1141,10 @@ TextureImporter:
       name: Die_32
       rect:
         serializedVersion: 2
-        x: 34
-        y: 658
-        width: 49
-        height: 63
+        x: 256
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1160,10 +1162,10 @@ TextureImporter:
       name: Die_33
       rect:
         serializedVersion: 2
-        x: 163
-        y: 659
-        width: 46
-        height: 59
+        x: 384
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1181,10 +1183,10 @@ TextureImporter:
       name: Die_34
       rect:
         serializedVersion: 2
-        x: 298
-        y: 657
-        width: 45
-        height: 60
+        x: 512
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1202,10 +1204,10 @@ TextureImporter:
       name: Die_35
       rect:
         serializedVersion: 2
-        x: 426
-        y: 654
-        width: 51
-        height: 63
+        x: 640
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1223,10 +1225,10 @@ TextureImporter:
       name: Die_36
       rect:
         serializedVersion: 2
-        x: 554
-        y: 655
-        width: 52
-        height: 60
+        x: 768
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1244,10 +1246,10 @@ TextureImporter:
       name: Die_37
       rect:
         serializedVersion: 2
-        x: 680
-        y: 653
-        width: 49
-        height: 58
+        x: 896
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1265,10 +1267,10 @@ TextureImporter:
       name: Die_38
       rect:
         serializedVersion: 2
-        x: 806
-        y: 649
-        width: 47
-        height: 55
+        x: 1024
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1286,10 +1288,10 @@ TextureImporter:
       name: Die_39
       rect:
         serializedVersion: 2
-        x: 940
-        y: 645
-        width: 48
-        height: 55
+        x: 1152
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1307,10 +1309,10 @@ TextureImporter:
       name: Die_40
       rect:
         serializedVersion: 2
-        x: 1069
-        y: 646
-        width: 49
-        height: 50
+        x: 1280
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1328,10 +1330,10 @@ TextureImporter:
       name: Die_41
       rect:
         serializedVersion: 2
-        x: 1197
-        y: 649
-        width: 49
-        height: 46
+        x: 1408
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1349,10 +1351,10 @@ TextureImporter:
       name: Die_42
       rect:
         serializedVersion: 2
-        x: 1323
-        y: 647
-        width: 46
-        height: 48
+        x: 1536
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1370,10 +1372,10 @@ TextureImporter:
       name: Die_43
       rect:
         serializedVersion: 2
-        x: 1447
-        y: 644
-        width: 49
-        height: 55
+        x: 1664
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1391,10 +1393,10 @@ TextureImporter:
       name: Die_44
       rect:
         serializedVersion: 2
-        x: 1561
-        y: 639
-        width: 64
-        height: 75
+        x: 1792
+        y: 640
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1412,10 +1414,10 @@ TextureImporter:
       name: Die_45
       rect:
         serializedVersion: 2
-        x: 1693
-        y: 639
-        width: 68
-        height: 74
+        x: 0
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1433,10 +1435,10 @@ TextureImporter:
       name: Die_46
       rect:
         serializedVersion: 2
-        x: 1824
-        y: 643
-        width: 67
-        height: 65
+        x: 128
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1454,10 +1456,10 @@ TextureImporter:
       name: Die_47
       rect:
         serializedVersion: 2
-        x: 25
-        y: 531
-        width: 50
-        height: 64
+        x: 256
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1475,10 +1477,10 @@ TextureImporter:
       name: Die_48
       rect:
         serializedVersion: 2
-        x: 157
-        y: 531
-        width: 49
-        height: 64
+        x: 384
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1496,10 +1498,10 @@ TextureImporter:
       name: Die_49
       rect:
         serializedVersion: 2
-        x: 290
-        y: 533
-        width: 43
-        height: 61
+        x: 512
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1517,10 +1519,10 @@ TextureImporter:
       name: Die_50
       rect:
         serializedVersion: 2
-        x: 415
-        y: 531
-        width: 53
-        height: 62
+        x: 640
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1538,10 +1540,10 @@ TextureImporter:
       name: Die_51
       rect:
         serializedVersion: 2
-        x: 544
-        y: 530
-        width: 57
-        height: 61
+        x: 768
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1559,10 +1561,10 @@ TextureImporter:
       name: Die_52
       rect:
         serializedVersion: 2
-        x: 677
-        y: 530
-        width: 49
-        height: 59
+        x: 896
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1580,10 +1582,10 @@ TextureImporter:
       name: Die_53
       rect:
         serializedVersion: 2
-        x: 804
-        y: 527
-        width: 43
-        height: 54
+        x: 1024
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1601,10 +1603,10 @@ TextureImporter:
       name: Die_54
       rect:
         serializedVersion: 2
-        x: 921
-        y: 525
-        width: 44
-        height: 53
+        x: 1152
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1622,10 +1624,10 @@ TextureImporter:
       name: Die_55
       rect:
         serializedVersion: 2
-        x: 1049
-        y: 532
-        width: 7
-        height: 7
+        x: 1280
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1643,10 +1645,10 @@ TextureImporter:
       name: Die_56
       rect:
         serializedVersion: 2
-        x: 1050
-        y: 523
-        width: 45
-        height: 52
+        x: 1408
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1664,10 +1666,10 @@ TextureImporter:
       name: Die_57
       rect:
         serializedVersion: 2
-        x: 1178
-        y: 526
-        width: 50
-        height: 48
+        x: 1536
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1685,10 +1687,10 @@ TextureImporter:
       name: Die_58
       rect:
         serializedVersion: 2
-        x: 1308
-        y: 526
-        width: 50
-        height: 47
+        x: 1664
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1706,10 +1708,10 @@ TextureImporter:
       name: Die_59
       rect:
         serializedVersion: 2
-        x: 1422
-        y: 523
-        width: 67
-        height: 48
+        x: 1792
+        y: 512
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1727,10 +1729,10 @@ TextureImporter:
       name: Die_60
       rect:
         serializedVersion: 2
-        x: 1535
-        y: 516
-        width: 90
-        height: 68
+        x: 0
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1748,10 +1750,10 @@ TextureImporter:
       name: Die_61
       rect:
         serializedVersion: 2
-        x: 1665
-        y: 515
-        width: 96
-        height: 69
+        x: 128
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1769,10 +1771,10 @@ TextureImporter:
       name: Die_62
       rect:
         serializedVersion: 2
-        x: 1800
-        y: 517
-        width: 93
-        height: 63
+        x: 256
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1790,10 +1792,10 @@ TextureImporter:
       name: Die_63
       rect:
         serializedVersion: 2
-        x: 37
-        y: 409
-        width: 46
-        height: 65
+        x: 384
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1811,10 +1813,10 @@ TextureImporter:
       name: Die_64
       rect:
         serializedVersion: 2
-        x: 166
-        y: 410
-        width: 41
-        height: 61
+        x: 512
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1832,10 +1834,10 @@ TextureImporter:
       name: Die_65
       rect:
         serializedVersion: 2
-        x: 290
-        y: 406
-        width: 44
-        height: 63
+        x: 640
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1853,10 +1855,10 @@ TextureImporter:
       name: Die_66
       rect:
         serializedVersion: 2
-        x: 417
-        y: 402
-        width: 43
-        height: 67
+        x: 768
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1874,10 +1876,10 @@ TextureImporter:
       name: Die_67
       rect:
         serializedVersion: 2
-        x: 542
-        y: 401
-        width: 45
-        height: 67
+        x: 896
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1895,10 +1897,10 @@ TextureImporter:
       name: Die_68
       rect:
         serializedVersion: 2
-        x: 670
-        y: 405
-        width: 43
-        height: 62
+        x: 1024
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1916,10 +1918,10 @@ TextureImporter:
       name: Die_69
       rect:
         serializedVersion: 2
-        x: 790
-        y: 408
-        width: 48
-        height: 54
+        x: 1152
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1937,10 +1939,10 @@ TextureImporter:
       name: Die_70
       rect:
         serializedVersion: 2
-        x: 913
-        y: 402
-        width: 53
-        height: 59
+        x: 1280
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1958,10 +1960,10 @@ TextureImporter:
       name: Die_71
       rect:
         serializedVersion: 2
-        x: 1045
-        y: 400
-        width: 49
-        height: 59
+        x: 1408
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1979,10 +1981,10 @@ TextureImporter:
       name: Die_72
       rect:
         serializedVersion: 2
-        x: 1173
-        y: 401
-        width: 52
-        height: 57
+        x: 1536
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2000,10 +2002,10 @@ TextureImporter:
       name: Die_73
       rect:
         serializedVersion: 2
-        x: 1302
-        y: 405
-        width: 59
-        height: 52
+        x: 1664
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2021,10 +2023,10 @@ TextureImporter:
       name: Die_74
       rect:
         serializedVersion: 2
-        x: 1426
-        y: 405
-        width: 69
-        height: 51
+        x: 1792
+        y: 384
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2042,10 +2044,10 @@ TextureImporter:
       name: Die_75
       rect:
         serializedVersion: 2
-        x: 1543
-        y: 404
-        width: 92
-        height: 68
+        x: 0
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2063,10 +2065,10 @@ TextureImporter:
       name: Die_76
       rect:
         serializedVersion: 2
-        x: 1671
-        y: 398
-        width: 95
-        height: 63
+        x: 128
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2084,10 +2086,10 @@ TextureImporter:
       name: Die_77
       rect:
         serializedVersion: 2
-        x: 1807
-        y: 397
-        width: 88
-        height: 52
+        x: 256
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2105,10 +2107,10 @@ TextureImporter:
       name: Die_78
       rect:
         serializedVersion: 2
-        x: 39
-        y: 286
-        width: 50
-        height: 65
+        x: 384
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2126,10 +2128,10 @@ TextureImporter:
       name: Die_79
       rect:
         serializedVersion: 2
-        x: 167
-        y: 285
-        width: 50
-        height: 60
+        x: 512
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2147,10 +2149,10 @@ TextureImporter:
       name: Die_80
       rect:
         serializedVersion: 2
-        x: 297
-        y: 285
-        width: 42
-        height: 60
+        x: 640
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2168,10 +2170,10 @@ TextureImporter:
       name: Die_81
       rect:
         serializedVersion: 2
-        x: 423
-        y: 280
-        width: 47
-        height: 66
+        x: 768
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2189,10 +2191,10 @@ TextureImporter:
       name: Die_82
       rect:
         serializedVersion: 2
-        x: 550
-        y: 277
-        width: 49
-        height: 69
+        x: 896
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2210,10 +2212,10 @@ TextureImporter:
       name: Die_83
       rect:
         serializedVersion: 2
-        x: 676
-        y: 279
-        width: 50
-        height: 67
+        x: 1024
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2231,10 +2233,10 @@ TextureImporter:
       name: Die_84
       rect:
         serializedVersion: 2
-        x: 802
-        y: 284
-        width: 44
-        height: 58
+        x: 1152
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2252,10 +2254,10 @@ TextureImporter:
       name: Die_85
       rect:
         serializedVersion: 2
-        x: 925
-        y: 291
-        width: 47
-        height: 51
+        x: 1280
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2273,10 +2275,10 @@ TextureImporter:
       name: Die_86
       rect:
         serializedVersion: 2
-        x: 1051
-        y: 289
-        width: 49
-        height: 54
+        x: 1408
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2294,10 +2296,10 @@ TextureImporter:
       name: Die_87
       rect:
         serializedVersion: 2
-        x: 1183
-        y: 286
-        width: 47
-        height: 57
+        x: 1536
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2315,10 +2317,10 @@ TextureImporter:
       name: Die_88
       rect:
         serializedVersion: 2
-        x: 1310
-        y: 284
-        width: 53
-        height: 58
+        x: 1664
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2336,10 +2338,10 @@ TextureImporter:
       name: Die_89
       rect:
         serializedVersion: 2
-        x: 1435
-        y: 282
-        width: 56
-        height: 57
+        x: 1792
+        y: 256
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2357,10 +2359,10 @@ TextureImporter:
       name: Die_90
       rect:
         serializedVersion: 2
-        x: 1552
-        y: 276
-        width: 78
-        height: 84
+        x: 0
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2378,10 +2380,10 @@ TextureImporter:
       name: Die_91
       rect:
         serializedVersion: 2
-        x: 1679
-        y: 270
-        width: 84
-        height: 80
+        x: 128
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2399,10 +2401,10 @@ TextureImporter:
       name: Die_92
       rect:
         serializedVersion: 2
-        x: 1809
-        y: 267
-        width: 83
-        height: 71
+        x: 256
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2420,10 +2422,10 @@ TextureImporter:
       name: Die_93
       rect:
         serializedVersion: 2
-        x: 47
-        y: 152
-        width: 50
-        height: 65
+        x: 384
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2441,10 +2443,10 @@ TextureImporter:
       name: Die_94
       rect:
         serializedVersion: 2
-        x: 177
-        y: 156
-        width: 46
-        height: 62
+        x: 512
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2462,10 +2464,10 @@ TextureImporter:
       name: Die_95
       rect:
         serializedVersion: 2
-        x: 299
-        y: 157
-        width: 45
-        height: 61
+        x: 640
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2483,10 +2485,10 @@ TextureImporter:
       name: Die_96
       rect:
         serializedVersion: 2
-        x: 421
-        y: 157
-        width: 51
-        height: 62
+        x: 768
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2504,10 +2506,10 @@ TextureImporter:
       name: Die_97
       rect:
         serializedVersion: 2
-        x: 549
-        y: 157
-        width: 51
-        height: 63
+        x: 896
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2525,10 +2527,10 @@ TextureImporter:
       name: Die_98
       rect:
         serializedVersion: 2
-        x: 681
-        y: 160
-        width: 48
-        height: 59
+        x: 1024
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2546,10 +2548,10 @@ TextureImporter:
       name: Die_99
       rect:
         serializedVersion: 2
-        x: 812
-        y: 161
-        width: 46
-        height: 54
+        x: 1152
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2567,10 +2569,10 @@ TextureImporter:
       name: Die_100
       rect:
         serializedVersion: 2
-        x: 933
-        y: 162
-        width: 47
-        height: 54
+        x: 1280
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2588,10 +2590,10 @@ TextureImporter:
       name: Die_101
       rect:
         serializedVersion: 2
-        x: 1059
-        y: 162
-        width: 48
-        height: 57
+        x: 1408
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2609,10 +2611,10 @@ TextureImporter:
       name: Die_102
       rect:
         serializedVersion: 2
-        x: 1187
-        y: 160
-        width: 49
-        height: 61
+        x: 1536
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2630,10 +2632,10 @@ TextureImporter:
       name: Die_103
       rect:
         serializedVersion: 2
-        x: 1320
-        y: 154
-        width: 45
-        height: 66
+        x: 1664
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2651,10 +2653,10 @@ TextureImporter:
       name: Die_104
       rect:
         serializedVersion: 2
-        x: 1448
-        y: 149
-        width: 49
-        height: 69
+        x: 1792
+        y: 128
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2672,10 +2674,10 @@ TextureImporter:
       name: Die_105
       rect:
         serializedVersion: 2
-        x: 1575
-        y: 141
-        width: 66
-        height: 85
+        x: 0
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2693,10 +2695,10 @@ TextureImporter:
       name: Die_106
       rect:
         serializedVersion: 2
-        x: 1694
-        y: 139
-        width: 69
-        height: 78
+        x: 128
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2714,10 +2716,10 @@ TextureImporter:
       name: Die_107
       rect:
         serializedVersion: 2
-        x: 1820
-        y: 138
-        width: 68
-        height: 67
+        x: 256
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2735,10 +2737,10 @@ TextureImporter:
       name: Die_108
       rect:
         serializedVersion: 2
-        x: 52
-        y: 21
-        width: 54
-        height: 69
+        x: 384
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2756,10 +2758,10 @@ TextureImporter:
       name: Die_109
       rect:
         serializedVersion: 2
-        x: 180
-        y: 21
-        width: 47
-        height: 67
+        x: 512
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2777,10 +2779,10 @@ TextureImporter:
       name: Die_110
       rect:
         serializedVersion: 2
-        x: 308
-        y: 25
-        width: 42
-        height: 61
+        x: 640
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2798,10 +2800,10 @@ TextureImporter:
       name: Die_111
       rect:
         serializedVersion: 2
-        x: 429
-        y: 23
-        width: 52
-        height: 64
+        x: 768
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2819,10 +2821,10 @@ TextureImporter:
       name: Die_112
       rect:
         serializedVersion: 2
-        x: 553
-        y: 22
-        width: 55
-        height: 65
+        x: 896
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2840,10 +2842,10 @@ TextureImporter:
       name: Die_113
       rect:
         serializedVersion: 2
-        x: 684
-        y: 23
-        width: 48
-        height: 64
+        x: 1024
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2861,10 +2863,10 @@ TextureImporter:
       name: Die_114
       rect:
         serializedVersion: 2
-        x: 818
-        y: 28
-        width: 43
-        height: 53
+        x: 1152
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2882,10 +2884,10 @@ TextureImporter:
       name: Die_115
       rect:
         serializedVersion: 2
-        x: 955
-        y: 30
-        width: 43
-        height: 51
+        x: 1280
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2903,10 +2905,10 @@ TextureImporter:
       name: Die_116
       rect:
         serializedVersion: 2
-        x: 1082
-        y: 30
-        width: 43
-        height: 55
+        x: 1408
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2924,10 +2926,10 @@ TextureImporter:
       name: Die_117
       rect:
         serializedVersion: 2
-        x: 1206
-        y: 28
-        width: 47
-        height: 58
+        x: 1536
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2945,10 +2947,10 @@ TextureImporter:
       name: Die_118
       rect:
         serializedVersion: 2
-        x: 1330
-        y: 24
-        width: 50
-        height: 61
+        x: 1664
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2966,10 +2968,10 @@ TextureImporter:
       name: Die_119
       rect:
         serializedVersion: 2
-        x: 1454
-        y: 24
-        width: 67
-        height: 59
+        x: 1792
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2983,73 +2985,10 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Die_120
-      rect:
-        serializedVersion: 2
-        x: 1575
-        y: 17
-        width: 90
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ed5283eca48600e10800000000000000
-      internalID: 2161842491634492894
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Die_121
-      rect:
-        serializedVersion: 2
-        x: 1694
-        y: 13
-        width: 98
-        height: 66
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 46d2db7e8e900da10800000000000000
-      internalID: 1932055136066940260
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Die_122
-      rect:
-        serializedVersion: 2
-        x: 1818
-        y: 12
-        width: 94
-        height: 63
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e07f87721a9c86870800000000000000
-      internalID: 8676406376118417166
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: aa2eec24795108041ad805838e2d4dbb
     internalID: 0
     vertices: []
     indices: 
@@ -3082,9 +3021,6 @@ TextureImporter:
       Die_118: 4755722854130267482
       Die_119: -774003799941021659
       Die_12: 1931568416614948922
-      Die_120: 2161842491634492894
-      Die_121: 1932055136066940260
-      Die_122: 8676406376118417166
       Die_13: -3923637963154812654
       Die_14: -2461632042885104765
       Die_15: 820483158511128614
