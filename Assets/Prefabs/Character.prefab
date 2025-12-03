@@ -180,6 +180,7 @@ GameObject:
   - component: {fileID: 2685627281287341744}
   - component: {fileID: 4523196965988979332}
   - component: {fileID: 8768953311415886451}
+  - component: {fileID: 5668739975071248169}
   - component: {fileID: 4091292101536293907}
   - component: {fileID: 1517345295572481833}
   - component: {fileID: 5904414318898432411}
@@ -274,6 +275,33 @@ MonoBehaviour:
   _targetZoneDistance: 0.7
   _targetZoneShowDuration: 0.8
   _targetZoneRadius: 0.5
+--- !u!114 &5668739975071248169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4530784739262083666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fbf298fbf394224ca84892ed5f46c97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  staminaDrainPerSecond: 0.5
+  staminaRegenPerSecond: 8
+  maxStamina: 100
+  minStaminaToRaise: 10
+  directionSmoothTime: 0.5
+  deadZone: 0.1
+  holdLastFrameDuration: 1
+  enableHoldFeature: 1
+  raiseAnimationDuration: 0.3
+  autoDetectAnimationTime: 1
+  useTriggerForAnimation: 1
+  shieldTriggerName: ShieldRaise
+  shieldStateName: Shield_Raise
+  animator: {fileID: 5904414318898432411}
+  combatSystem: {fileID: 8768953311415886451}
 --- !u!58 &4091292101536293907
 CircleCollider2D:
   m_ObjectHideFlags: 0
