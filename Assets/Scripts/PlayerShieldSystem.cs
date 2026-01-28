@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 using System.Collections;
 
 public class PlayerShieldSystem : MonoBehaviour
@@ -10,6 +11,17 @@ public class PlayerShieldSystem : MonoBehaviour
     [SerializeField] private float maxStamina = 100f;
     [SerializeField] private float minStaminaToRaise = 10f;
 
+    [Header("Movement Restrictions")]
+    [SerializeField] private bool restrictMovementWhenShielding = true;
+    [SerializeField] private float movementSpeedMultiplier = 0f; // 0 = полная остановка, 0.5 = 50% скорости
+
+    [Header("Shield Collider")]
+    [SerializeField] private GameObject shieldPrefab;
+    [SerializeField] private Transform shieldSpawnPoint;
+    [SerializeField] private float shieldOffset = 0.5f;
+    [SerializeField] private float shieldScale = 1f;
+    [SerializeField] private bool destroyShieldOnLower = true;
+
     [Header("Direction Settings")]
     [SerializeField] private float directionSmoothTime = 0.1f;
     [SerializeField] private float deadZone = 0.1f;
@@ -19,21 +31,26 @@ public class PlayerShieldSystem : MonoBehaviour
     [SerializeField] private bool enableHoldFeature = true;
 
     [Header("Animation Settings")]
-    [SerializeField] private float raiseAnimationDuration = 0.5f; // Длительность анимации поднятия
-    [SerializeField] private bool autoDetectAnimationTime = true; // Автоматически определять длительность
+    [SerializeField] private float raiseAnimationDuration = 0.5f;
+    [SerializeField] private bool autoDetectAnimationTime = true;
     [SerializeField] private bool useTriggerForAnimation = true;
     [SerializeField] private string shieldTriggerName = "ShieldRaise";
-    [SerializeField] private string shieldStateName = "Shield_Raise"; // Имя состояния для автоопределения
+    [SerializeField] private string shieldStateName = "Shield_Raise";
+
+    [Header("Attack Block Settings")]
+    [SerializeField] private float attackCooldownAfterAnimation = 0.2f; // Задержка после анимации
 
     [Header("References")]
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerCombatSystem combatSystem;
+    [SerializeField] private Rigidbody2D playerRigidbody;
 
     // Состояния
     private bool isShielding = false;
     private bool isHoldingLastFrame = false;
     private bool canShield = true;
     private bool isPlayingAnimation = false;
+    private bool isAttackCooldown = false;
     private float currentStamina;
 
     // Параметры для Blend Tree
@@ -46,6 +63,11 @@ public class PlayerShieldSystem : MonoBehaviour
     private Coroutine shieldHoldCoroutine;
     private Coroutine shieldAnimationCoroutine;
     private Coroutine shieldCooldownCoroutine;
+    private Coroutine attackCooldownCoroutine;
+
+    // Ссылка на созданный щит
+    private GameObject currentShieldInstance;
+    private bool shieldActive = false;
 
     // Для заморозки анимации
     private float animatorOriginalSpeed = 1f;
@@ -53,18 +75,28 @@ public class PlayerShieldSystem : MonoBehaviour
     private float animationTimer = 0f;
     private float actualAnimationDuration = 0.5f;
 
+    // Контроль движения
+    private Vector2 lastVelocity;
+    private bool wasMoving = false;
+
+    private PlayerInput playerInput;
+
     void Start()
     {
+        playerInput = GetComponent<PlayerInput>();
+
         if (animator == null)
             animator = GetComponent<Animator>();
 
-        if (combatSystem != null)
+        if (combatSystem == null)
             combatSystem = GetComponent<PlayerCombatSystem>();
+
+        if (playerRigidbody == null)
+            playerRigidbody = GetComponent<Rigidbody2D>();
 
         currentStamina = maxStamina;
         animatorOriginalSpeed = animator.speed;
 
-        // Автоматически определяем длительность анимации
         if (autoDetectAnimationTime)
         {
             DetectAnimationDuration();
@@ -73,17 +105,114 @@ public class PlayerShieldSystem : MonoBehaviour
         {
             actualAnimationDuration = raiseAnimationDuration;
         }
+
+        if (shieldSpawnPoint == null)
+        {
+            shieldSpawnPoint = transform;
+        }
+
+        // Подписываемся на события атаки, если они существуют
+        if (combatSystem != null)
+        {
+            // Проверяем, есть ли события через рефлексию (или создаем их в PlayerCombatSystem)
+            SetupAttackEvents();
+        }
     }
 
-    // Метод для определения длительности анимации
+    void SetupAttackEvents()
+    {
+        // Способ 1: Если есть события
+        var attackStartedEvent = combatSystem.GetType().GetEvent("OnAttackStarted");
+        var attackFinishedEvent = combatSystem.GetType().GetEvent("OnAttackFinished");
+
+        if (attackStartedEvent != null && attackFinishedEvent != null)
+        {
+            // Подписываемся через рефлексию
+            attackStartedEvent.AddEventHandler(combatSystem, (Action)OnAttackStarted);
+            attackFinishedEvent.AddEventHandler(combatSystem, (Action)OnAttackFinished);
+        }
+        else
+        {
+            // Способ 2: Если нет событий, используем публичные методы
+            Debug.LogWarning("⚠️ События атаки не найдены. Используется альтернативный метод.");
+            StartCoroutine(CheckAttackStateRoutine());
+        }
+    }
+
+    IEnumerator CheckAttackStateRoutine()
+    {
+        while (true)
+        {
+            // Проверяем состояние атаки через публичные методы или свойства
+            bool isAttacking = false;
+
+            // Способ A: Через метод IsAttacking()
+            var isAttackingMethod = combatSystem.GetType().GetMethod("IsAttacking");
+            if (isAttackingMethod != null)
+            {
+                isAttacking = (bool)isAttackingMethod.Invoke(combatSystem, null);
+            }
+            // Способ B: Через свойство
+            else
+            {
+                var isAttackingProperty = combatSystem.GetType().GetProperty("IsAttacking");
+                if (isAttackingProperty != null)
+                {
+                    isAttacking = (bool)isAttackingProperty.GetValue(combatSystem);
+                }
+            }
+
+            if (isAttacking && !isAttackCooldown)
+            {
+                OnAttackStarted();
+            }
+
+            yield return new WaitForSeconds(0.1f); // Проверяем каждые 0.1 секунды
+        }
+    }
+
+    private void OnAttackStarted()
+    {
+        isAttackCooldown = true;
+
+        // Принудительно опускаем щит, если он поднят
+        if (isShielding)
+        {
+            StopShielding();
+        }
+
+        Debug.Log("⚔️ Атака началась - щит заблокирован");
+    }
+
+    private void OnAttackFinished()
+    {
+        // Запускаем кулдаун после окончания анимации
+        if (attackCooldownAfterAnimation > 0)
+        {
+            if (attackCooldownCoroutine != null)
+                StopCoroutine(attackCooldownCoroutine);
+
+            attackCooldownCoroutine = StartCoroutine(AttackCooldownRoutine());
+        }
+        else
+        {
+            isAttackCooldown = false;
+        }
+    }
+
+    IEnumerator AttackCooldownRoutine()
+    {
+        yield return new WaitForSeconds(attackCooldownAfterAnimation);
+        isAttackCooldown = false;
+        Debug.Log("✅ Кулдаун атаки окончен - можно использовать щит");
+    }
+
     void DetectAnimationDuration()
     {
-        actualAnimationDuration = raiseAnimationDuration; // Значение по умолчанию
+        actualAnimationDuration = raiseAnimationDuration;
 
-        // Попробуем получить длительность из состояния анимации
         if (animator != null && !string.IsNullOrEmpty(shieldStateName))
         {
-            // Получаем все состояния из контроллера
             var controller = animator.runtimeAnimatorController;
             if (controller != null)
             {
@@ -92,17 +221,21 @@ public class PlayerShieldSystem : MonoBehaviour
                     if (clip.name.Contains("Shield") || clip.name.Contains("Raise"))
                     {
                         actualAnimationDuration = clip.length;
-                        Debug.Log($"📏 Обнаружена анимация '{clip.name}' длительностью {clip.length:F2} сек");
                     }
                 }
             }
         }
-
-        Debug.Log($"⏱️ Фактическая длительность анимации: {actualAnimationDuration:F2} сек");
     }
 
     void Update()
     {
+        // Если движение заблокировано - прекращаем использование щита
+        if (IsMovementBlocked() && isShielding)
+        {
+            StopShielding();
+            return;
+        }
+
         HandleShieldInput();
         UpdateStamina();
         UpdateAnimation();
@@ -111,12 +244,89 @@ public class PlayerShieldSystem : MonoBehaviour
         {
             UpdateHoldState();
         }
+
+        if (shieldActive && currentShieldInstance != null)
+        {
+            UpdateShieldPosition();
+        }
+    }
+
+    void FixedUpdate()
+    {
+        // Контроль движения в FixedUpdate для физики
+        ControlMovement();
+    }
+
+    void ControlMovement()
+    {
+        if (!restrictMovementWhenShielding || playerRigidbody == null) return;
+
+        if (isShielding)
+        {
+            // Сохраняем последнюю скорость перед остановкой
+            if (playerRigidbody.velocity.magnitude > 0.1f)
+            {
+                lastVelocity = playerRigidbody.velocity;
+                wasMoving = true;
+            }
+
+            // Останавливаем или замедляем движение
+            if (movementSpeedMultiplier <= 0f)
+            {
+                // Полная остановка
+                playerRigidbody.velocity = Vector2.zero;
+            }
+            else
+            {
+                // Замедление
+                playerRigidbody.velocity *= movementSpeedMultiplier;
+            }
+        }
+        else if (wasMoving)
+        {
+            // Восстанавливаем движение (опционально)
+            wasMoving = false;
+        }
+    }
+
+    void UpdateShieldPosition()
+    {
+        if (currentShieldInstance == null) return;
+
+        Vector2 direction = new Vector2(currentShieldX, currentShieldY);
+        if (direction.magnitude < 0.1f)
+        {
+            direction = lastValidDirection;
+        }
+
+        Vector3 shieldPosition;
+        if (shieldSpawnPoint != transform)
+        {
+            shieldPosition = shieldSpawnPoint.position;
+        }
+        else
+        {
+            shieldPosition = transform.position + (Vector3)direction.normalized * shieldOffset;
+        }
+
+        currentShieldInstance.transform.position = shieldPosition;
+
+        if (direction.magnitude > 0.1f)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            currentShieldInstance.transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+        }
     }
 
     void HandleShieldInput()
     {
-        // Нажатие правой кнопки мыши
-        if (Input.GetMouseButtonDown(1) && canShield && currentStamina >= minStaminaToRaise)
+        // Проверяем, можно ли использовать щит
+        bool canUseShieldNow = canShield &&
+                              currentStamina >= minStaminaToRaise &&
+                              !isAttackCooldown &&
+                              !IsMovementBlocked(); // Добавляем проверку
+
+        if (Input.GetMouseButtonDown(1) && canUseShieldNow)
         {
             if (!isShielding)
             {
@@ -124,18 +334,24 @@ public class PlayerShieldSystem : MonoBehaviour
             }
         }
 
-        // Отпускание правой кнопки мыши
         if (Input.GetMouseButtonUp(1) && isShielding)
         {
             StopShielding();
         }
     }
 
+    private bool IsMovementBlocked()
+    {
+        return HealthSystem.Instance != null &&
+               (HealthSystem.Instance.IsDead() ||
+                HealthSystem.Instance.IsHurting());
+    }
+
     void StartShielding()
     {
         if (isShielding || isPlayingAnimation) return;
 
-        Debug.Log($"🚀 Старт поднятия щита. Длительность анимации: {actualAnimationDuration:F2} сек");
+        Debug.Log($"🚀 Старт поднятия щита (атака заблокирована: {isAttackCooldown})");
 
         isShielding = true;
         isHoldingLastFrame = false;
@@ -143,44 +359,108 @@ public class PlayerShieldSystem : MonoBehaviour
         canShield = false;
         animationTimer = 0f;
 
-        // Восстанавливаем нормальную скорость анимации
         animator.speed = animatorOriginalSpeed;
 
-        // ЗАПУСКАЕМ АНИМАЦИЮ
         if (useTriggerForAnimation && !string.IsNullOrEmpty(shieldTriggerName))
         {
             animator.SetTrigger(shieldTriggerName);
-            Debug.Log($"🎬 Активирован триггер: {shieldTriggerName}");
         }
         else
         {
             animator.SetBool("IsShielding", true);
-            Debug.Log("🎬 Установлен параметр: IsShielding = true");
         }
 
-        // Устанавливаем параметры направления
         UpdateShieldDirectionImmediate();
+        ActivateShield();
 
-        // Запускаем таймер кд
         if (shieldCooldownCoroutine != null)
             StopCoroutine(shieldCooldownCoroutine);
 
         shieldCooldownCoroutine = StartCoroutine(ShieldCooldownRoutine());
 
-        // Запускаем корутину для отслеживания анимации
         if (shieldAnimationCoroutine != null)
             StopCoroutine(shieldAnimationCoroutine);
 
         shieldAnimationCoroutine = StartCoroutine(PlayShieldAnimation());
 
-        Debug.Log($"🛡️ Щит поднимается... (ожидание {actualAnimationDuration:F2} сек)");
+        // Останавливаем движение при начале поднятия щита
+        if (restrictMovementWhenShielding && playerRigidbody != null)
+        {
+            lastVelocity = playerRigidbody.velocity;
+            playerRigidbody.velocity = Vector2.zero;
+        }
+
+        if (playerInput != null)
+        {
+            playerInput.actions["Move"].Disable();
+        }
+    }
+
+    void ActivateShield()
+    {
+        if (shieldActive && currentShieldInstance != null) return;
+
+        if (shieldPrefab != null)
+        {
+            Vector3 spawnPosition = shieldSpawnPoint != transform ?
+                shieldSpawnPoint.position :
+                transform.position + (Vector3)lastValidDirection.normalized * shieldOffset;
+
+            currentShieldInstance = Instantiate(shieldPrefab, spawnPosition, Quaternion.identity);
+            currentShieldInstance.transform.localScale = Vector3.one * shieldScale;
+
+            float angle = Mathf.Atan2(lastValidDirection.y, lastValidDirection.x) * Mathf.Rad2Deg;
+            currentShieldInstance.transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+
+            SetupShieldCollider(currentShieldInstance);
+            currentShieldInstance.transform.SetParent(transform, true);
+
+            shieldActive = true;
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Префаб щита не назначен!");
+        }
+    }
+
+    void SetupShieldCollider(GameObject shield)
+    {
+        Rigidbody2D rb = shield.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.simulated = false;
+        }
+
+        Collider2D[] colliders = shield.GetComponentsInChildren<Collider2D>();
+        foreach (Collider2D collider in colliders)
+        {
+            collider.isTrigger = true;
+        }
+    }
+
+    void DeactivateShield()
+    {
+        if (currentShieldInstance != null)
+        {
+            currentShieldInstance.transform.SetParent(null);
+
+            if (destroyShieldOnLower)
+            {
+                Destroy(currentShieldInstance);
+            }
+            else
+            {
+                currentShieldInstance.SetActive(false);
+            }
+        }
+
+        currentShieldInstance = null;
+        shieldActive = false;
     }
 
     IEnumerator PlayShieldAnimation()
     {
-        Debug.Log($"⏳ Начало отсчета анимации: {actualAnimationDuration:F2} сек");
-
-        // Ждем завершения анимации поднятия
         float timer = 0f;
 
         while (timer < actualAnimationDuration && isShielding)
@@ -188,17 +468,8 @@ public class PlayerShieldSystem : MonoBehaviour
             timer += Time.deltaTime;
             animationTimer = timer;
 
-            // Показываем прогресс каждые 0.1 секунды
-            if (Mathf.Floor(timer * 10) != Mathf.Floor((timer - Time.deltaTime) * 10))
-            {
-                float progress = timer / actualAnimationDuration;
-                Debug.Log($"📊 Прогресс анимации: {progress:P0} ({timer:F2}/{actualAnimationDuration:F2} сек)");
-            }
-
-            // Проверяем не отжали ли кнопку раньше времени
             if (!Input.GetMouseButton(1))
             {
-                Debug.Log("🛑 Кнопка отжата во время анимации");
                 StopShielding();
                 yield break;
             }
@@ -208,21 +479,17 @@ public class PlayerShieldSystem : MonoBehaviour
 
         if (!isShielding)
         {
-            Debug.Log("⚠️ Анимация прервана (щит уже опущен)");
             yield break;
         }
 
         isPlayingAnimation = false;
-        Debug.Log($"✅ Анимация поднятия завершена! Прошло {timer:F2} сек");
 
-        // После завершения анимации проверяем что делать дальше
         if (Input.GetMouseButton(1) && enableHoldFeature && holdLastFrameDuration > 0)
         {
             StartHoldLastFrame();
         }
         else
         {
-            Debug.Log("🔽 Кнопка не зажата или функция отключена - опускаем щит");
             StopShielding();
         }
     }
@@ -231,18 +498,13 @@ public class PlayerShieldSystem : MonoBehaviour
     {
         if (!enableHoldFeature || holdLastFrameDuration <= 0)
         {
-            Debug.Log("❌ Функция заморозки отключена или время = 0");
             StopShielding();
             return;
         }
 
         isHoldingLastFrame = true;
         holdTimer = 0f;
-
-        // Замораживаем анимацию на последнем кадре
         animator.speed = 0f;
-
-        Debug.Log($"❄️ Заморозка кадра на {holdLastFrameDuration} секунд");
 
         if (shieldHoldCoroutine != null)
             StopCoroutine(shieldHoldCoroutine);
@@ -254,43 +516,26 @@ public class PlayerShieldSystem : MonoBehaviour
     {
         holdTimer += Time.deltaTime;
 
-        // Показываем прогресс каждые 0.2 секунды
-        if (Mathf.Floor(holdTimer * 5) != Mathf.Floor((holdTimer - Time.deltaTime) * 5))
-        {
-            float progress = holdTimer / holdLastFrameDuration;
-            Debug.Log($"⏱️ Прогресс заморозки: {progress:P0} ({holdTimer:F1}/{holdLastFrameDuration} сек)");
-        }
-
         if (!Input.GetMouseButton(1))
         {
-            Debug.Log("🛑 Кнопка отжата, прерываем заморозку");
             StopShielding();
         }
 
         if (GetMoveInput().magnitude > deadZone)
         {
-            Debug.Log("🚶 Персонаж двигается, прерываем заморозку");
             StopShielding();
         }
     }
 
     IEnumerator HoldLastFrameRoutine()
     {
-        Debug.Log($"⏰ Таймер заморозки запущен: {holdLastFrameDuration} сек");
-
         yield return new WaitForSeconds(holdLastFrameDuration);
-
-        Debug.Log("⏰ Время заморозки истекло, опускаем щит");
         StopShielding();
     }
 
-    void StopShielding()
+    public void StopShielding()
     {
-        if (!isShielding)
-        {
-            Debug.Log("ℹ️ Щит уже опущен");
-            return;
-        }
+        if (!isShielding) return;
 
         Debug.Log("🔽 Начало опускания щита");
 
@@ -298,10 +543,8 @@ public class PlayerShieldSystem : MonoBehaviour
         isHoldingLastFrame = false;
         isPlayingAnimation = false;
 
-        // Восстанавливаем скорость анимации
         animator.speed = animatorOriginalSpeed;
 
-        // СБРАСЫВАЕМ ПАРАМЕТРЫ АНИМАЦИИ
         if (useTriggerForAnimation)
         {
             animator.ResetTrigger(shieldTriggerName);
@@ -311,7 +554,14 @@ public class PlayerShieldSystem : MonoBehaviour
             animator.SetBool("IsShielding", false);
         }
 
-        // Останавливаем все корутины
+        DeactivateShield();
+
+        // Восстанавливаем анимацию (если нужно)
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", 0f);
+        }
+
         if (shieldHoldCoroutine != null)
         {
             StopCoroutine(shieldHoldCoroutine);
@@ -324,21 +574,21 @@ public class PlayerShieldSystem : MonoBehaviour
             shieldAnimationCoroutine = null;
         }
 
-        // Запускаем таймер для возможности снова поднять щит
         if (shieldCooldownCoroutine != null)
             StopCoroutine(shieldCooldownCoroutine);
 
         shieldCooldownCoroutine = StartCoroutine(ShieldCooldownRoutine());
 
-        Debug.Log("🛡️ Щит опущен");
+        if (playerInput != null)
+        {
+            playerInput.actions["Move"].Enable();
+        }
     }
 
     IEnumerator ShieldCooldownRoutine()
     {
-        // Ждем небольшое время для предотвращения спама
         yield return new WaitForSeconds(0.1f);
         canShield = true;
-        Debug.Log("🔄 Можно снова поднять щит");
     }
 
     void UpdateStamina()
@@ -363,7 +613,6 @@ public class PlayerShieldSystem : MonoBehaviour
 
     void UpdateAnimation()
     {
-        // Обновляем направление щита только когда щит поднят
         if (isShielding && !isHoldingLastFrame)
         {
             UpdateShieldDirection();
@@ -443,46 +692,51 @@ public class PlayerShieldSystem : MonoBehaviour
         return lastValidDirection;
     }
 
-    // Метод для отладки
-    void OnGUI()
+    public bool IsAttackBlocked(Vector2 attackDirection)
     {
-        if (!Application.isPlaying) return;
+        if (!isShielding || !shieldActive || currentShieldInstance == null)
+        {
+            return false;
+        }
 
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.white;
-        style.fontSize = 14;
-        style.richText = true;
+        Vector2 shieldDirection = new Vector2(currentShieldX, currentShieldY);
 
-        string statusColor = isShielding ? (isHoldingLastFrame ? "yellow" : "cyan") : "white";
-        string animationColor = isPlayingAnimation ? "lime" : "white";
+        if (shieldDirection.magnitude < 0.1f)
+        {
+            return false;
+        }
 
-        //GUI.Label(new Rect(10, 100, 600, 300),
-        //    $"<color=cyan><b>=== SHIELD SYSTEM DEBUG ===</b></color>\n" +
-        //    $"<color={statusColor}>Состояние щита: {(isShielding ? "ПОДНЯТ" : "ОПУЩЕН")}</color>\n" +
-        //    $"<color={animationColor}>Анимация: {(isPlayingAnimation ? "ИГРАЕТ" : "ОСТАНОВЛЕНА")}</color>\n" +
-        //    $"Заморозка: {(isHoldingLastFrame ? "АКТИВНА" : "НЕ АКТИВНА")}\n" +
-        //    $"Можно поднять: {(canShield ? "ДА" : "НЕТ")}\n" +
-        //    $"\n<color=yellow>Таймеры:</color>\n" +
-        //    $"• Стамина: <color=green>{currentStamina:F0}</color>/{maxStamina}\n" +
-        //    $"• Анимация: <color={animationColor}>{animationTimer:F2}</color>/{actualAnimationDuration:F2} сек\n" +
-        //    $"• Заморозка: <color=yellow>{holdTimer:F1}</color>/{holdLastFrameDuration} сек\n" +
-        //    $"• Скорость аниматора: {animator.speed:F1}\n" +
-        //    $"\n<color=magenta>Настройки:</color>\n" +
-        //    $"• Длит. анимации: {actualAnimationDuration:F2} сек\n" +
-        //    $"• Автоопределение: {(autoDetectAnimationTime ? "ВКЛ" : "ВЫКЛ")}\n" +
-        //    $"• Исп. триггер: {(useTriggerForAnimation ? "ДА" : "НЕТ")}\n" +
-        //    $"• Имя триггера: {shieldTriggerName}\n" +
-        //    $"• ПКМ нажата: {(Input.GetMouseButton(1) ? "ДА" : "НЕТ")}\n" +
-        //    $"• Направление: X={currentShieldX:F2}, Y={currentShieldY:F2}",
-        //    style);
+        shieldDirection = shieldDirection.normalized;
+        attackDirection = attackDirection.normalized;
+        Vector2 attackDirectionFromPlayer = -attackDirection;
+
+        float angle = Vector2.Angle(shieldDirection, attackDirectionFromPlayer);
+        return angle < 90f;
+    }
+
+    public Vector2 GetShieldDirection()
+    {
+        return new Vector2(currentShieldX, currentShieldY);
+    }
+
+    public Vector3 GetShieldPosition()
+    {
+        if (currentShieldInstance != null)
+        {
+            return currentShieldInstance.transform.position;
+        }
+        return transform.position + (Vector3)lastValidDirection.normalized * shieldOffset;
     }
 
     // Методы для внешнего доступа
     public bool IsShielding() => isShielding;
+    public bool IsMovementRestricted() => isShielding && restrictMovementWhenShielding;
+    public bool IsShieldActive() => shieldActive && isShielding;
     public bool IsHoldingLastFrame() => isHoldingLastFrame;
     public bool IsPlayingAnimation() => isPlayingAnimation;
+    public bool IsAttackCooldown() => isAttackCooldown; // Новый метод
     public float GetStaminaPercent() => currentStamina / maxStamina;
-    public bool CanRaiseShield() => canShield && currentStamina >= minStaminaToRaise;
+    public bool CanRaiseShield() => canShield && currentStamina >= minStaminaToRaise && !isAttackCooldown;
     public float GetHoldProgress() => holdLastFrameDuration > 0 ? Mathf.Clamp01(holdTimer / holdLastFrameDuration) : 0f;
     public float GetAnimationProgress() => actualAnimationDuration > 0 ? Mathf.Clamp01(animationTimer / actualAnimationDuration) : 0f;
 
@@ -496,74 +750,31 @@ public class PlayerShieldSystem : MonoBehaviour
         }
     }
 
-    // Метод для принудительного обновления длительности анимации
-    public void UpdateAnimationDuration(float newDuration)
+    public void DebugShieldInfo()
     {
-        if (autoDetectAnimationTime)
-        {
-            DetectAnimationDuration();
-        }
-        else
-        {
-            actualAnimationDuration = newDuration;
-            raiseAnimationDuration = newDuration;
-        }
-        Debug.Log($"🔄 Обновлена длительность анимации: {actualAnimationDuration:F2} сек");
+        Debug.Log($"=== SHIELD DEBUG INFO ===");
+        Debug.Log($"isShielding: {isShielding}");
+        Debug.Log($"shieldActive: {shieldActive}");
+        Debug.Log($"currentShieldInstance: {currentShieldInstance != null}");
+        Debug.Log($"currentStamina: {currentStamina}/{maxStamina}");
+        Debug.Log($"shieldDirection: X={currentShieldX:F2}, Y={currentShieldY:F2}");
+        Debug.Log($"isAttackCooldown: {isAttackCooldown}");
+        Debug.Log($"=========================");
     }
 
-    public void SetHoldDuration(float duration)
+    void OnDestroy()
     {
-        holdLastFrameDuration = Mathf.Max(0, duration);
-        Debug.Log($"🔄 Установлена длительность заморозки: {holdLastFrameDuration} сек");
-    }
-
-    public void SetHoldEnabled(bool enabled)
-    {
-        enableHoldFeature = enabled;
-        Debug.Log($"🔄 Функция заморозки: {(enabled ? "ВКЛЮЧЕНА" : "ВЫКЛЮЧЕНА")}");
-        if (!enabled && isHoldingLastFrame) StopShielding();
-    }
-
-    public void SetRaiseAnimationDuration(float duration)
-    {
-        raiseAnimationDuration = Mathf.Max(0.1f, duration);
-        if (!autoDetectAnimationTime)
+        // Отписываемся от событий при уничтожении объекта
+        if (combatSystem != null)
         {
-            actualAnimationDuration = raiseAnimationDuration;
-        }
-        Debug.Log($"🔄 Установлена длительность анимации: {raiseAnimationDuration:F2} сек");
-    }
+            var attackStartedEvent = combatSystem.GetType().GetEvent("OnAttackStarted");
+            var attackFinishedEvent = combatSystem.GetType().GetEvent("OnAttackFinished");
 
-    public void SetAutoDetect(bool autoDetect)
-    {
-        autoDetectAnimationTime = autoDetect;
-        if (autoDetect)
-        {
-            DetectAnimationDuration();
-        }
-        else
-        {
-            actualAnimationDuration = raiseAnimationDuration;
-        }
-    }
-
-    public void SetUseTrigger(bool useTrigger) => useTriggerForAnimation = useTrigger;
-    public void SetShieldTriggerName(string name) => shieldTriggerName = name;
-    public void SetShieldStateName(string name) => shieldStateName = name;
-
-    void OnDrawGizmosSelected()
-    {
-        if (!Application.isPlaying) return;
-
-        Vector2 direction = new Vector2(currentShieldX, currentShieldY);
-        if (direction.magnitude > 0.1f)
-        {
-            Gizmos.color = isHoldingLastFrame ? Color.yellow :
-                          isShielding ? new Color(0, 0.5f, 1f, 0.8f) :
-                          new Color(0, 1f, 1f, 0.5f);
-
-            float lineLength = isHoldingLastFrame ? 2f : 1.5f;
-            Gizmos.DrawLine(transform.position, transform.position + (Vector3)direction * lineLength);
+            if (attackStartedEvent != null && attackFinishedEvent != null)
+            {
+                attackStartedEvent.RemoveEventHandler(combatSystem, (Action)OnAttackStarted);
+                attackFinishedEvent.RemoveEventHandler(combatSystem, (Action)OnAttackFinished);
+            }
         }
     }
 }

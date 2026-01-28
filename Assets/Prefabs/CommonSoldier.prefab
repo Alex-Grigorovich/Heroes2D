@@ -184,7 +184,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 6
   m_Sprite: {fileID: -7008412969330441016, guid: 4a7c0da22d195094c996d9182a363b82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -230,8 +230,9 @@ MonoBehaviour:
   _moveSpeed: 1
   _stoppingDistance: 0.25
   _attackRange: 1.5
-  _attackCooldown: 2
-  _attackDamage: 5
+  _attackCooldown: 4
+  _attackDamage: 2
+  _staminaDamageToShield: 3
   _windupDuration: 0.3
   _attackDelay: 0.6
   _attackDuration: 0.2
@@ -239,9 +240,16 @@ MonoBehaviour:
   _enemyZonePrefab: {fileID: 7299663328918109519, guid: 6127fb68bb3d36c4ea15337e87a95035, type: 3}
   _enemyZoneDistance: 0.7
   _enemyZoneShowDuration: 0.8
-  _enemyZoneRadius: 0.5
+  _enemyZoneRadius: 1
+  _canBeBlocked: 1
+  _blockEffectPrefab: {fileID: 0}
+  _blockSound: {fileID: 0}
+  _blockPushbackForce: 1
   _playerHitColor: {r: 1, g: 0, b: 0, a: 1}
+  _blockedHitColor: {r: 0, g: 0, b: 1, a: 1}
   _hitFlashDuration: 0.4
+  _blockFlashDuration: 0.3
+  _attackBoolName: attack
 --- !u!114 &8225369375158268783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,7 +264,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 25
   _defense: 10
+  _deathAnimationDuration: 2
+  _corpseDuration: 5
+  _destroyOnDeath: 1
+  _deathEffectPrefab: {fileID: 0}
+  _deathSound: {fileID: 0}
+  _deathTriggerName: Death
+  _deathLayerName: Death
+  _attackBoolName: attack
   _deathEffect: {fileID: 0}
+  _hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  _hitFlashDuration: 0.4
 --- !u!58 &3154956979430331585
 CircleCollider2D:
   m_ObjectHideFlags: 0

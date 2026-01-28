@@ -39,7 +39,11 @@ public class PlayerCombatSystem : MonoBehaviour
     [SerializeField] private GameObject _targetZonePrefab;
     [SerializeField] private float _targetZoneDistance = 0.7f;
     [SerializeField] private float _targetZoneShowDuration = 0.8f;
-    [SerializeField] private float _targetZoneRadius = 0.5f; // Радиус зоны поражения вокруг TargetZone
+    [SerializeField] private float _targetZoneRadius = 0.5f;
+
+    [Header("Death Settings")]
+    [SerializeField] private bool _disableOnDeath = true;
+    [SerializeField] private bool _stopMovementOnDeath = true;
 
     // Компоненты
     private Rigidbody2D _rigidbody;
@@ -54,7 +58,7 @@ public class PlayerCombatSystem : MonoBehaviour
 
     // Состояние боя
     private bool _isAttacking = false;
-    private bool _isDealingDamage = false; // Флаг что сейчас наносится урон
+    private bool _isDealingDamage = false;
     private float _currentAttackCooldown = 0f;
     private Vector2 _attackDirection;
 
@@ -70,6 +74,18 @@ public class PlayerCombatSystem : MonoBehaviour
     // Для предотвращения многократного урона по одной цели
     private HashSet<GameObject> _alreadyDamagedEnemies = new HashSet<GameObject>();
 
+    // Состояние персонажа
+    private bool _isDead = false;
+    private HealthSystem _healthSystem;
+    private bool _movementFrozen = false;
+
+    // События для системы щита
+    public event Action OnAttackStarted;
+    public event Action OnAttackFinished;
+
+    // Свойство для доступа из других систем
+    public bool IsAttacking => _isAttacking;
+
     void Start()
     {
         _animator = GetComponent<Animator>();
@@ -82,6 +98,13 @@ public class PlayerCombatSystem : MonoBehaviour
             _originalPlayerColor = _playerSpriteRenderer.color;
         }
 
+        // Получаем ссылку на HealthSystem
+        _healthSystem = GetComponent<HealthSystem>();
+        if (_healthSystem == null)
+        {
+            _healthSystem = FindObjectOfType<HealthSystem>();
+        }
+
         // Создаем ретиклу наведения
         if (_showTargetingReticle && _targetingReticlePrefab != null)
         {
@@ -90,8 +113,53 @@ public class PlayerCombatSystem : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
+        // Проверяем, заблокировано ли движение
+        if (IsMovementBlocked())
+        {
+            // Сбрасываем ввод движения
+            _moveInput = Vector2.zero;
+
+            // Отключаем атаки
+            if (_isAttacking)
+            {
+                EndAttack();
+            }
+
+            // Отключаем таргетинг
+            if (_targetingReticle != null)
+            {
+                _targetingReticle.SetActive(false);
+            }
+
+            return;
+        }
+
+        // Проверяем состояние смерти
+        CheckDeathState();
+
+        // Проверяем состояние урона
+        bool isHurting = false;
+        if (_healthSystem != null)
+        {
+            isHurting = _healthSystem.IsHurting();
+        }
+
+        // Если персонаж мертв, движение заморожено или получает урон - отключаем управление
+        if (_isDead || _movementFrozen || isHurting)
+        {
+            DisableMovement();
+
+            // Если получаем урон, прерываем атаку
+            if (isHurting && _isAttacking)
+            {
+                EndAttack();
+            }
+
+            return;
+        }
+
         UpdateMousePosition();
         UpdateTargeting();
         UpdateCooldowns();
@@ -99,18 +167,112 @@ public class PlayerCombatSystem : MonoBehaviour
         UpdateAnimation();
         UpdateTargetingReticle();
 
-        // Проверяем попадание по врагам в реальном времени, когда наносится урон
         if (_isDealingDamage && _targetZoneInstance != null)
         {
             CheckTargetZoneDamage();
         }
     }
 
+
+
+
+    private bool IsMovementBlocked()
+    {
+        return HealthSystem.Instance != null &&
+               (HealthSystem.Instance.IsDead() ||
+                HealthSystem.Instance.IsHurting() ||  // Уже есть
+                IsMovementFrozenByHealthSystem());
+    }
+
+    private bool IsMovementFrozenByHealthSystem()
+    {
+        // Проверяем наличие метода BlockMovement в HealthSystem через рефлексию
+        var healthSystem = HealthSystem.Instance;
+        if (healthSystem != null)
+        {
+            var blockWASDField = healthSystem.GetType().GetField("blockWASD",
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Instance);
+
+            if (blockWASDField != null)
+            {
+                return (bool)blockWASDField.GetValue(healthSystem);
+            }
+        }
+        return false;
+    }
+
+    void CheckDeathState()
+    {
+        if (_healthSystem != null)
+        {
+            var isDeadProperty = _healthSystem.GetType().GetProperty("IsDead");
+            if (isDeadProperty != null)
+            {
+                _isDead = (bool)isDeadProperty.GetValue(_healthSystem);
+            }
+            else
+            {
+                var isDeadMethod = _healthSystem.GetType().GetMethod("IsDead");
+                if (isDeadMethod != null)
+                {
+                    _isDead = (bool)isDeadMethod.Invoke(_healthSystem, null);
+                }
+                else
+                {
+                    var currentHealthProperty = _healthSystem.GetType().GetProperty("CurrentHealth");
+                    if (currentHealthProperty != null)
+                    {
+                        float currentHealth = (float)currentHealthProperty.GetValue(_healthSystem);
+                        _isDead = currentHealth <= 0;
+                    }
+                }
+            }
+        }
+    }
+
+    void DisableMovement()
+    {
+        // Останавливаем движение
+        if (_stopMovementOnDeath || _movementFrozen)
+        {
+            _moveInput = Vector2.zero;
+            _velocity = Vector2.zero;
+            if (_rigidbody != null)
+            {
+                _rigidbody.velocity = Vector2.zero;
+            }
+        }
+
+        // Отключаем атаки
+        if (_isAttacking && _movementFrozen)
+        {
+            EndAttack();
+        }
+
+        // Отключаем таргетинг
+        if (_targetingReticle != null && _movementFrozen)
+        {
+            _targetingReticle.SetActive(false);
+        }
+
+        // Уничтожаем зоны атаки
+        if (_movementFrozen)
+        {
+            DestroyTargetZone();
+        }
+
+        // Отключаем анимацию движения
+        if (_animator != null)
+        {
+            _animator.SetFloat("Speed", 0f);
+        }
+    }
+
     private void CheckTargetZoneDamage()
     {
-        if (_targetZoneInstance == null) return;
+        if (_targetZoneInstance == null || _isDead || _movementFrozen) return;
 
-        // Ищем всех врагов в радиусе TargetZone
         Collider2D[] enemiesInZone = Physics2D.OverlapCircleAll(
             _targetZoneInstance.transform.position,
             _targetZoneRadius,
@@ -123,17 +285,14 @@ public class PlayerCombatSystem : MonoBehaviour
         {
             if (!enemy.CompareTag("Enemy")) continue;
 
-            // Проверяем, не наносили ли уже урон этому врагу в этой атаке
             if (_alreadyDamagedEnemies.Contains(enemy.gameObject)) continue;
 
-            // Проверяем шанс попадания
             if (CheckHitChance(enemy.gameObject))
             {
                 DealSingleDamage(enemy.gameObject);
-                _alreadyDamagedEnemies.Add(enemy.gameObject); // Помечаем как получившего урон
+                _alreadyDamagedEnemies.Add(enemy.gameObject);
                 hits++;
 
-                // Ограничиваем количество целей за удар
                 if (hits >= _maxTargetsPerSwing) break;
             }
         }
@@ -146,7 +305,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void UpdateMousePosition()
     {
-        // Получаем позицию мыши в мировых координатах
+        if (_isDead || _movementFrozen) return;
+
         Vector3 mouseScreenPos = Input.mousePosition;
         mouseScreenPos.z = -_mainCamera.transform.position.z;
         _mouseWorldPosition = _mainCamera.ScreenToWorldPoint(mouseScreenPos);
@@ -154,20 +314,20 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void UpdateTargeting()
     {
+        if (_isDead || _movementFrozen) return;
+
         if (_autoTargetClosestEnemy)
         {
             FindBestTarget();
         }
         else
         {
-            // Базовое направление к курсору
             _attackDirection = (_mouseWorldPosition - (Vector2)transform.position).normalized;
         }
     }
 
     private void FindBestTarget()
     {
-        // Ищем всех врагов в радиусе наведения
         Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(transform.position, _targetingRadius, _enemyLayer);
 
         GameObject bestTarget = null;
@@ -180,10 +340,7 @@ public class PlayerCombatSystem : MonoBehaviour
             Vector2 toEnemy = (Vector2)enemy.transform.position - _mouseWorldPosition;
             float distanceToCursor = toEnemy.magnitude;
 
-            // Вычисляем "ценность" цели (чем ближе к курсору - тем лучше)
             float score = distanceToCursor;
-
-            // Предпочитаем цели, которые ближе к игроку
             float distanceToPlayer = Vector2.Distance(transform.position, enemy.transform.position);
             score += distanceToPlayer * 0.3f;
 
@@ -198,19 +355,17 @@ public class PlayerCombatSystem : MonoBehaviour
 
         if (_currentTarget != null)
         {
-            // Направление атаки - к выбранной цели
             _attackDirection = ((Vector2)_currentTarget.transform.position - (Vector2)transform.position).normalized;
         }
         else
         {
-            // Если цели нет - направление к курсору
             _attackDirection = (_mouseWorldPosition - (Vector2)transform.position).normalized;
         }
     }
 
     private void UpdateTargetingReticle()
     {
-        if (_targetingReticle != null)
+        if (_targetingReticle != null && !_isDead && !_movementFrozen)
         {
             if (_currentTarget != null && _showTargetingReticle)
             {
@@ -222,10 +377,16 @@ public class PlayerCombatSystem : MonoBehaviour
                 _targetingReticle.SetActive(false);
             }
         }
+        else if (_targetingReticle != null)
+        {
+            _targetingReticle.SetActive(false);
+        }
     }
 
     private void UpdateCooldowns()
     {
+        if (_isDead || _movementFrozen) return;
+
         if (_currentAttackCooldown > 0f)
         {
             _currentAttackCooldown -= Time.deltaTime;
@@ -234,6 +395,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void HandleAttackInput()
     {
+        if (_isDead || _movementFrozen) return;
+
         if (Input.GetMouseButtonDown(0) && CanAttack())
         {
             StartAttack();
@@ -242,22 +405,20 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private bool CanAttack()
     {
-        return _currentAttackCooldown <= 0f && !_isAttacking;
+        return _currentAttackCooldown <= 0f && !_isAttacking && !_isDead && !_movementFrozen;
     }
 
     private void StartAttack()
     {
+        if (_isDead || _movementFrozen) return;
+
         _isAttacking = true;
         _currentAttackCooldown = _attackCooldown;
 
-        // Очищаем список уже получивших урон врагов
+        OnAttackStarted?.Invoke();
         _alreadyDamagedEnemies.Clear();
-
         _animator.SetBool("IsAttacking", true);
-
-        // Создаем и показываем зону атаки в направлении удара
         CreateTargetZone();
-
         StartCoroutine(AttackSequence());
 
         Debug.Log($"🎯 Attack started! Direction: {_attackDirection}");
@@ -265,15 +426,11 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void CreateTargetZone()
     {
-        if (_targetZonePrefab != null)
+        if (_targetZonePrefab != null && !_isDead && !_movementFrozen)
         {
-            // Уничтожаем старую зону, если она есть
             DestroyTargetZone();
 
-            // Вычисляем позицию зоны атаки ВОКРУГ персонажа
             Vector3 targetZonePosition = transform.position + (Vector3)_attackDirection * _targetZoneDistance;
-
-            // Создаем новую зону атаки
             _targetZoneInstance = Instantiate(_targetZonePrefab, targetZonePosition, Quaternion.identity);
             _targetZoneRenderer = _targetZoneInstance.GetComponent<SpriteRenderer>();
 
@@ -286,7 +443,7 @@ public class PlayerCombatSystem : MonoBehaviour
                 Debug.LogWarning("❌ TargetZone prefab doesn't have SpriteRenderer component!");
             }
         }
-        else
+        else if (_targetZonePrefab == null && !_isDead && !_movementFrozen)
         {
             Debug.LogWarning("❌ TargetZone prefab is not assigned!");
         }
@@ -305,41 +462,57 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private IEnumerator AttackSequence()
     {
-        // Ждем начала анимации удара
+        if (_isDead || _movementFrozen)
+        {
+            EndAttack();
+            yield break;
+        }
+
         yield return new WaitForSeconds(_attackDuration * 0.2f);
 
-        // Начинаем наносить урон
+        if (_isDead || _movementFrozen)
+        {
+            EndAttack();
+            yield break;
+        }
+
         _isDealingDamage = true;
         Debug.Log("💥 START dealing damage phase");
 
-        // Период нанесения урона (основная часть анимации)
         yield return new WaitForSeconds(_attackDuration * 0.4f);
 
-        // Заканчиваем наносить урон
+        if (_isDead || _movementFrozen)
+        {
+            _isDealingDamage = false;
+            EndAttack();
+            yield break;
+        }
+
         _isDealingDamage = false;
         Debug.Log("💥 END dealing damage phase");
 
-        // Уничтожаем зону атаки
         DestroyTargetZone();
 
-        // Завершаем атаку
         yield return new WaitForSeconds(_attackDuration * 0.4f);
-        EndAttack();
+
+        if (!_isDead && !_movementFrozen)
+        {
+            EndAttack();
+        }
     }
 
-    // Новый метод для одинарного урона через TargetZone
     private void DealSingleDamage(GameObject enemy)
     {
+        if (_isDead || _movementFrozen) return;
+
         EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
         if (enemyHealth != null)
         {
             Vector2 directionToEnemy = (enemy.transform.position - transform.position).normalized;
 
-            // ОДИНАРНЫЙ урон (базовый урон без множителей)
             int finalDamage = CalculateDiabloDamage();
             bool isCritical = CheckCriticalStrike();
 
-            // Критический урон применяется как обычно
             if (isCritical)
             {
                 finalDamage = Mathf.RoundToInt(finalDamage * _criticalMultiplier);
@@ -355,14 +528,39 @@ public class PlayerCombatSystem : MonoBehaviour
         }
     }
 
-    // Старый метод для обратной совместимости
-    private void DealDiabloStyleDamage(GameObject enemy)
+    // Метод для вызова из системы здоровья
+    public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce = 0f)
     {
-        DealSingleDamage(enemy); // Теперь используем одинарный урон
+        if (_isDead || _movementFrozen)
+        {
+            Debug.Log("Персонаж мертв или движение заморожено, урон не принимается");
+            return;
+        }
+
+        Debug.Log($"💥 Персонаж получает урон: {damage}, направление: {hitDirection}");
+
+        // Наносим урон через HealthSystem
+        if (_healthSystem != null)
+        {
+            var takeDamageMethod = _healthSystem.GetType().GetMethod("TakeDamage");
+            if (takeDamageMethod != null)
+            {
+                takeDamageMethod.Invoke(_healthSystem, new object[] { damage });
+            }
+        }
+
+        // Применяем отбрасывание
+        if (knockbackForce > 0f && _rigidbody != null)
+        {
+            _rigidbody.velocity = Vector2.zero;
+            _rigidbody.AddForce(hitDirection * knockbackForce, ForceMode2D.Impulse);
+        }
     }
 
     private bool CheckHitChance(GameObject enemy)
     {
+        if (_isDead || _movementFrozen) return false;
+
         EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
         if (enemyHealth == null) return true;
 
@@ -377,6 +575,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private int CalculateDiabloDamage()
     {
+        if (_isDead || _movementFrozen) return 0;
+
         int baseDamage = UnityEngine.Random.Range(_minDamage, _maxDamage + 1);
         int finalDamage = baseDamage;
         Debug.Log($"⚔️ Damage roll: {baseDamage} (range: {_minDamage}-{_maxDamage})");
@@ -385,6 +585,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private bool CheckCriticalStrike()
     {
+        if (_isDead || _movementFrozen) return false;
+
         bool isCritical = UnityEngine.Random.Range(0f, 1f) <= _criticalChance;
         if (isCritical) Debug.Log($"🎲 Critical strike! Chance: {_criticalChance * 100}%");
         return isCritical;
@@ -392,11 +594,10 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void ShowDamageEffect(Vector3 position, int damage, bool isCritical)
     {
+        if (_isDead || _movementFrozen) return;
+
         StartCoroutine(FlashEnemy(position, isCritical));
         CreateDamagePopup(position, damage, isCritical);
-
-        // УБРАЛИ мигание персонажа - оно не нужно для игрока при атаке
-        // FlashPlayer();
     }
 
     private IEnumerator FlashEnemy(Vector3 position, bool isCritical)
@@ -444,17 +645,25 @@ public class PlayerCombatSystem : MonoBehaviour
         }
     }
 
-    private void EndAttack()
+    public void EndAttack()
     {
-        _isAttacking = false;
-        _isDealingDamage = false;
-        _animator.SetBool("IsAttacking", false);
+        if (_isAttacking)
+        {
+            _isAttacking = false;
+            _isDealingDamage = false;
 
-        // Очищаем список поврежденных врагов при завершении атаки
-        _alreadyDamagedEnemies.Clear();
+            OnAttackFinished?.Invoke();
 
-        // Убеждаемся, что цвет игрока сброшен (на всякий случай)
-        ResetPlayerColor();
+            if (_animator != null)
+            {
+                _animator.SetBool("IsAttacking", false);
+            }
+
+            _alreadyDamagedEnemies.Clear();
+            ResetPlayerColor();
+
+            Debug.Log("✅ Attack finished");
+        }
     }
 
     private void ResetPlayerColor()
@@ -467,31 +676,88 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void UpdateAnimation()
     {
-        Vector2 animationDirection;
-
-        if (_isAttacking)
+        if (_isDead || _movementFrozen)
         {
-            animationDirection = _attackDirection;
+            if (_animator != null)
+            {
+                _animator.SetFloat("Speed", 0f);
+            }
+            return;
+        }
+
+        // Проверяем, получает ли персонаж урон
+        bool isHurting = false;
+        if (_healthSystem != null)
+        {
+            isHurting = _healthSystem.IsHurting();
+        }
+
+        // ПРИОРИТЕТ: Урон > Атака > Движение > Наведение
+        if (isHurting)
+        {
+            // Во время получения урона - не обновляем анимацию
+            // HealthSystem уже управляет аниматором через свои параметры
+            if (_animator != null)
+            {
+                _animator.SetFloat("Speed", 0f); // Останавливаем движение
+                _animator.SetBool("IsAttacking", false); // Отменяем атаку
+            }
+            return;
+        }
+        else if (_isAttacking)
+        {
+            // Во время атаки - только направление атаки
+            if (_animator != null)
+            {
+                _animator.SetFloat("Horizontal", _attackDirection.x);
+                _animator.SetFloat("Vertical", _attackDirection.y);
+                _animator.SetFloat("Speed", 0f);
+                _animator.SetBool("IsAttacking", true);
+            }
+        }
+        else if (_moveInput.magnitude > 0.1f)
+        {
+            // Движение
+            if (_animator != null)
+            {
+                _animator.SetFloat("Horizontal", _moveInput.normalized.x);
+                _animator.SetFloat("Vertical", _moveInput.normalized.y);
+                _animator.SetFloat("Speed", _moveInput.magnitude);
+                _animator.SetBool("IsAttacking", false);
+            }
         }
         else
         {
-            if (_moveInput.magnitude > 0.1f)
+            // Без движения - направление на мышь
+            Vector2 lookDirection = (_mouseWorldPosition - (Vector2)transform.position).normalized;
+            if (lookDirection.magnitude > 0.1f && _animator != null)
             {
-                animationDirection = _moveInput.normalized;
-            }
-            else
-            {
-                animationDirection = (_mouseWorldPosition - (Vector2)transform.position).normalized;
+                _animator.SetFloat("Horizontal", lookDirection.x);
+                _animator.SetFloat("Vertical", lookDirection.y);
+                _animator.SetFloat("Speed", 0f);
+                _animator.SetBool("IsAttacking", false);
             }
         }
-
-        _animator.SetFloat("Horizontal", animationDirection.x);
-        _animator.SetFloat("Vertical", animationDirection.y);
-        _animator.SetFloat("Speed", _moveInput.magnitude);
     }
 
     private void FixedUpdate()
     {
+        // Проверяем состояние урона
+        bool isHurting = false;
+        if (_healthSystem != null)
+        {
+            isHurting = _healthSystem.IsHurting();
+        }
+
+        if (_isDead || _movementFrozen || isHurting)
+        {
+            if (_rigidbody != null)
+            {
+                _rigidbody.velocity = Vector2.zero;
+            }
+            return;
+        }
+
         if (!_isAttacking)
         {
             Move();
@@ -499,12 +765,17 @@ public class PlayerCombatSystem : MonoBehaviour
         else
         {
             _velocity = Vector2.zero;
-            _rigidbody.velocity = Vector2.zero;
+            if (_rigidbody != null)
+            {
+                _rigidbody.velocity = Vector2.zero;
+            }
         }
     }
 
     private void Move()
     {
+        if (_isDead || _movementFrozen) return;
+
         Vector2 targetVelocity = _moveInput * _MaxSpeed;
         Vector2 velocityDiff = targetVelocity - _velocity;
         float accelerateRate = (Mathf.Abs(targetVelocity.magnitude) > 0.01f) ? _acceleration : _deceleration;
@@ -515,25 +786,72 @@ public class PlayerCombatSystem : MonoBehaviour
         _velocity = Vector2.ClampMagnitude(_velocity, _MaxSpeed);
         _velocity *= MathF.Pow(1f - _velocityPower, Time.fixedDeltaTime);
 
-        _rigidbody.MovePosition(_rigidbody.position + _velocity * Time.fixedDeltaTime);
-        _rigidbody.angularVelocity = 0f;
-        transform.rotation = Quaternion.identity;
+        if (_rigidbody != null)
+        {
+            _rigidbody.MovePosition(_rigidbody.position + _velocity * Time.fixedDeltaTime);
+            _rigidbody.angularVelocity = 0f;
+            transform.rotation = Quaternion.identity;
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (_isDead || _movementFrozen || !enabled)
+        {
+            _moveInput = Vector2.zero;
+            return;
+        }
+
         _moveInput = context.ReadValue<Vector2>();
     }
 
     public void OnAttack(InputAction.CallbackContext context)
     {
+        if (_isDead || _movementFrozen || !enabled) return;
+
         if (context.performed && CanAttack())
         {
             StartAttack();
         }
     }
 
-    // Добавляем методы для управления жизненным циклом
+    public void SetDeadState(bool isDead)
+    {
+        _isDead = isDead;
+
+        if (isDead)
+        {
+            DisableMovement();
+        }
+    }
+
+    public void FreezeMovement(bool freeze)
+    {
+        _movementFrozen = freeze;
+
+        if (freeze)
+        {
+            _moveInput = Vector2.zero;
+            _velocity = Vector2.zero;
+
+            if (_rigidbody != null)
+            {
+                _rigidbody.velocity = Vector2.zero;
+            }
+
+            if (_isAttacking)
+            {
+                EndAttack();
+            }
+
+            Debug.Log("Player movement frozen");
+        }
+        else
+        {
+            Debug.Log("Player movement unfrozen");
+        }
+    }
+
     private void OnDestroy()
     {
         DestroyTargetZone();
@@ -549,43 +867,38 @@ public class PlayerCombatSystem : MonoBehaviour
     // Визуализация в редакторе
     private void OnDrawGizmosSelected()
     {
-        // Радиус атаки
+        if (_isDead || _movementFrozen) return;
+
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, _attackRadius);
 
-        // Радиус наведения
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, _targetingRadius);
 
-        // Радиус TargetZone (зона поражения)
         if (Application.isPlaying && _targetZoneInstance != null)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(_targetZoneInstance.transform.position, _targetZoneRadius);
         }
 
-        // Радиус выбора цели вокруг курсора
         if (Application.isPlaying)
         {
             Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(_mouseWorldPosition, _targetSelectionRadius);
         }
 
-        // Угол атаки
         if (Application.isPlaying && _isAttacking)
         {
             Gizmos.color = Color.red;
             DrawAttackAngleGizmo();
         }
 
-        // Линия к текущей цели
         if (Application.isPlaying && _currentTarget != null)
         {
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, _currentTarget.transform.position);
         }
 
-        // Позиция TargetZone
         if (Application.isPlaying && _targetZoneInstance != null)
         {
             Gizmos.color = Color.blue;
@@ -613,4 +926,7 @@ public class PlayerCombatSystem : MonoBehaviour
         Gizmos.DrawLine(transform.position + (Vector3)leftDir * _attackRadius,
                         transform.position + (Vector3)rightDir * _attackRadius);
     }
+
+
+
 }

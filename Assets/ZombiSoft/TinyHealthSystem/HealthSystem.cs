@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class HealthSystem : MonoBehaviour
 {
@@ -28,20 +29,49 @@ public class HealthSystem : MonoBehaviour
     public float manaPoint = 100f;
     public float maxManaPoint = 100f;
 
+    public event Action OnPlayerDeath; // Событие смерти
+
     //==============================================================
     // Animation System
     //==============================================================
-    [Header("Death Animations")]
+    [Header("Animation System")]
     public Animator playerAnimator;
 
-    [Header("Animator Parameters")]
+    [Header("Death Animation")]
     public string deathTrigger = "Die";
     public string deathDirectionParameter = "DeathDirection";
+
+    [Header("Hurt Animation - 2D Blend Tree")]
+    public string hurtBoolParameter = "IsHurting"; // Изменено на bool
+    public string hurtHorizontalParameter = "HurtX"; // Параметр X для Blend Tree
+    public string hurtVerticalParameter = "HurtY";   // Параметр Y для Blend Tree
+    public float hurtAnimationDuration = 1.5f;
+    public float hurtAnimationSpeed = 1f; // Регулировка скорости анимации
+
+    [Header("Movement Control")]
+    [Tooltip("Замораживать ли движение во время анимации урона")]
+    public bool freezeMovementDuringHurt = true;
+
+    [Header("Animation States")]
     private bool isDead = false;
+    private bool isHurting = false;
+    private Coroutine hurtCoroutine;
+
+    [Header("Animation Interrupt")]
+    public bool interruptAttacksOnHurt = true;
 
     // Ссылка на PlayerCombatSystem для получения направления
     private PlayerCombatSystem playerCombat;
     private Camera mainCamera;
+
+    // Компоненты для управления движением
+    private Rigidbody2D rb;
+    private Vector2 originalVelocity;
+    private bool originalKinematicState;
+    private RigidbodyConstraints2D originalConstraints;
+
+    // Флаги для блокировки клавиш
+    private bool blockWASD = false;
 
     //==============================================================
     // Regenerate Health & Mana
@@ -75,7 +105,7 @@ public class HealthSystem : MonoBehaviour
     //==============================================================
     void Update()
     {
-        if (Regenerate && !isDead)
+        if (Regenerate && !isDead && !isHurting)
             Regen();
 
         if (Input.GetKeyDown(KeyCode.T) && !isDead)
@@ -83,13 +113,29 @@ public class HealthSystem : MonoBehaviour
             TakeDamage(damageOnT);
         }
 
-        TestAllDirections();
+        // Тестирование анимаций урона по клавишам 1-8
+        TestHurtAnimations();
+
+        // Отладочная информация
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            Debug.Log($"HealthSystem Status: isDead={isDead}, isHurting={isHurting}, blockWASD={blockWASD}");
+        }
     }
 
     void Start()
     {
         InitializeAnimator();
         InitializePlayerCombatReference();
+        InitializeMovementComponents();
+        SetHurtAnimationSpeed();
+
+        // Добавьте инициализацию переменных
+        if (rb != null)
+        {
+            originalKinematicState = rb.isKinematic;
+            originalConstraints = rb.constraints;
+        }
     }
 
     //==============================================================
@@ -136,6 +182,105 @@ public class HealthSystem : MonoBehaviour
     }
 
     //==============================================================
+    // Initialize Movement Components
+    //==============================================================
+    private void InitializeMovementComponents()
+    {
+        // Получаем Rigidbody2D
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            rb = GetComponentInChildren<Rigidbody2D>();
+        }
+    }
+
+    //==============================================================
+    // Set Hurt Animation Speed
+    //==============================================================
+    private void SetHurtAnimationSpeed()
+    {
+        if (playerAnimator != null)
+        {
+            // Устанавливаем скорость анимации через параметр
+            playerAnimator.SetFloat("HurtSpeed", hurtAnimationSpeed);
+        }
+    }
+
+    //==============================================================
+    // Простой метод блокировки WASD
+    //==============================================================
+    public bool IsMovementBlocked()
+    {
+        return blockWASD || isDead;
+    }
+
+    private void BlockWASD()
+    {
+        if (!freezeMovementDuringHurt) return;
+
+        Debug.Log("=== BLOCKING WASD KEYS ===");
+        blockWASD = true;
+
+        // Вызываем единый менеджер управления
+        PlayerControlManager controlManager = GetComponent<PlayerControlManager>();
+        if (controlManager != null)
+        {
+            controlManager.BlockAllControls(true);
+        }
+        else
+        {
+            // Старый код для совместимости
+            if (playerCombat != null)
+            {
+                var method = playerCombat.GetType().GetMethod("FreezeMovement");
+                if (method != null)
+                {
+                    method.Invoke(playerCombat, new object[] { true });
+                }
+            }
+        }
+    }
+
+    private void UnblockWASD()
+    {
+        if (!freezeMovementDuringHurt) return;
+
+        Debug.Log("=== UNBLOCKING WASD KEYS ===");
+        blockWASD = false;
+
+        // Вызываем единый менеджер управления
+        PlayerControlManager controlManager = GetComponent<PlayerControlManager>();
+        if (controlManager != null && !isDead)
+        {
+            controlManager.BlockAllControls(false);
+        }
+        else
+        {
+            // Старый код для совместимости
+            if (playerCombat != null && !isDead)
+            {
+                var method = playerCombat.GetType().GetMethod("FreezeMovement");
+                if (method != null)
+                {
+                    method.Invoke(playerCombat, new object[] { false });
+                }
+            }
+        }
+    }
+
+    public void BlockMovement(bool block)
+    {
+        if (block)
+        {
+            BlockWASD();
+        }
+        else
+        {
+            UnblockWASD();
+        }
+    }
+
+    //==============================================================
     // Regenerate Health & Mana
     //==============================================================
     private void Regen()
@@ -177,10 +322,40 @@ public class HealthSystem : MonoBehaviour
 
     public void TakeDamage(float Damage)
     {
-        if (GodMode || isDead) return;
+        if (GodMode || isDead || isHurting)
+        {
+            Debug.Log($"TakeDamage blocked - GodMode: {GodMode}, isDead: {isDead}, isHurting: {isHurting}");
+            return;
+        }
+
+        Debug.Log($"=== TAKING DAMAGE: {Damage} ===");
+        Debug.Log($"Current HP: {hitPoint} -> {hitPoint - Damage}");
+
+        // Прерываем атаку, если она активна
+        if (interruptAttacksOnHurt)
+        {
+            PlayerCombatSystem combat = GetComponent<PlayerCombatSystem>();
+            if (combat != null && combat.IsAttacking)
+            {
+                combat.EndAttack();
+                Debug.Log("⚡ Attack interrupted by damage!");
+            }
+        }
+
         hitPoint -= Damage;
         if (hitPoint < 1) hitPoint = 0;
         UpdateGraphics();
+
+        if (hitPoint > 0)
+        {
+            Debug.Log("Starting hurt animation...");
+            StartHurtAnimation();
+        }
+        else
+        {
+            Debug.Log("Player died from this damage!");
+        }
+
         StartCoroutine(PlayerHurts());
     }
 
@@ -249,42 +424,13 @@ public class HealthSystem : MonoBehaviour
     }
 
     //==============================================================
-    // Direction Detection using PlayerCombatSystem logic
-    //==============================================================
-    private int GetDeathDirectionIndex()
-    {
-        // ТЕСТОВЫЙ РЕЖИМ - используйте клавиши 1-8 для проверки направлений
-        if (Input.GetKey(KeyCode.Alpha1)) { Debug.Log("TEST: Direction 0 - Down"); return 0; }
-        if (Input.GetKey(KeyCode.Alpha2)) { Debug.Log("TEST: Direction 1 - Left"); return 1; }
-        if (Input.GetKey(KeyCode.Alpha3)) { Debug.Log("TEST: Direction 2 - Left-Down"); return 2; }
-        if (Input.GetKey(KeyCode.Alpha4)) { Debug.Log("TEST: Direction 3 - Left-Up"); return 3; }
-        if (Input.GetKey(KeyCode.Alpha5)) { Debug.Log("TEST: Direction 4 - Right"); return 4; }
-        if (Input.GetKey(KeyCode.Alpha6)) { Debug.Log("TEST: Direction 5 - Right-Down"); return 5; }
-        if (Input.GetKey(KeyCode.Alpha7)) { Debug.Log("TEST: Direction 6 - Right-Up"); return 6; }
-        if (Input.GetKey(KeyCode.Alpha8)) { Debug.Log("TEST: Direction 7 - Up"); return 7; }
-
-        // Используем логику определения направления из PlayerCombatSystem
-        Vector2 animationDirection = GetCurrentAnimationDirection();
-
-        Debug.Log($"Animation Direction: {animationDirection}");
-
-        // Преобразуем направление в индекс
-        int directionIndex = DirectionToIndex(animationDirection);
-
-        Debug.Log($"Calculated Direction Index: {directionIndex}");
-
-        return directionIndex;
-    }
-
-    //==============================================================
-    // Get current animation direction using PlayerCombatSystem logic
+    // Get current animation direction
     //==============================================================
     private Vector2 GetCurrentAnimationDirection()
     {
         Vector2 animationDirection = Vector2.zero;
 
         // Получаем направление непосредственно из аниматора
-        // Используем те же параметры, что и в PlayerCombatSystem
         if (playerAnimator != null)
         {
             float horizontal = playerAnimator.GetFloat("Horizontal");
@@ -292,12 +438,9 @@ public class HealthSystem : MonoBehaviour
 
             animationDirection = new Vector2(horizontal, vertical);
 
-            Debug.Log($"From Animator - Horizontal: {horizontal}, Vertical: {vertical}");
-
             // Если направление почти нулевое, используем запасной вариант
             if (animationDirection.magnitude < 0.1f)
             {
-                Debug.Log("Animator direction is small, using fallback");
                 animationDirection = GetFallbackDirection();
             }
             else
@@ -307,7 +450,6 @@ public class HealthSystem : MonoBehaviour
         }
         else
         {
-            Debug.Log("Animator not found, using fallback");
             animationDirection = GetFallbackDirection();
         }
 
@@ -315,11 +457,11 @@ public class HealthSystem : MonoBehaviour
     }
 
     //==============================================================
-    // Fallback direction detection (как в PlayerCombatSystem)
+    // Fallback direction detection
     //==============================================================
     private Vector2 GetFallbackDirection()
     {
-        // Получаем направление к курсору (как в PlayerCombatSystem)
+        // Получаем направление к курсору
         if (mainCamera != null)
         {
             Vector3 mouseScreenPos = Input.mousePosition;
@@ -327,7 +469,6 @@ public class HealthSystem : MonoBehaviour
             Vector2 mouseWorldPosition = mainCamera.ScreenToWorldPoint(mouseScreenPos);
 
             Vector2 direction = (mouseWorldPosition - (Vector2)transform.position).normalized;
-            Debug.Log($"Fallback direction to mouse: {direction}");
             return direction;
         }
 
@@ -340,24 +481,180 @@ public class HealthSystem : MonoBehaviour
 
             if (direction.magnitude > 0.1f)
             {
-                Debug.Log($"Fallback direction from animator: {direction}");
                 return direction;
             }
         }
 
         // Если все остальное не сработало, используем направление вперед
-        Debug.Log("Fallback direction: Vector2.up");
         return Vector2.up;
     }
 
     //==============================================================
-    // Convert direction vector to index (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+    // Hurt Animation Methods для 2D Blend Tree
+    //==============================================================
+    private void StartHurtAnimation()
+    {
+        if (playerAnimator == null || isHurting || isDead || hitPoint <= 0) return;
+
+        // Останавливаем предыдущую анимацию урона
+        if (hurtCoroutine != null)
+        {
+            StopCoroutine(hurtCoroutine);
+        }
+
+        // Запускаем новую анимацию урона
+        hurtCoroutine = StartCoroutine(PlayHurtAnimation());
+    }
+
+    private IEnumerator PlayHurtAnimation()
+    {
+        isHurting = true;
+        Debug.Log($"PlayHurtAnimation started. isHurting: {isHurting}");
+
+        // Мгновенная блокировка управления
+        BlockWASD();
+
+        // Получаем текущее направление
+        Vector2 direction = GetCurrentAnimationDirection();
+        Debug.Log($"Hurt direction: {direction}");
+
+        // Немедленно обновляем параметры анимации
+        if (playerAnimator != null)
+        {
+            // Прерываем все текущие анимации
+            playerAnimator.SetBool(hurtBoolParameter, false); // Сначала сбрасываем
+            playerAnimator.Update(0f); // Принудительное обновление аниматора
+
+            // Устанавливаем направление
+            playerAnimator.SetFloat(hurtHorizontalParameter, direction.x);
+            playerAnimator.SetFloat(hurtVerticalParameter, direction.y);
+
+            // Включаем анимацию урона
+            playerAnimator.SetBool(hurtBoolParameter, true);
+
+            // Сбрасываем анимацию движения
+            playerAnimator.SetFloat("Speed", 0f);
+
+            Debug.Log($"Set {hurtBoolParameter} = true, HurtX: {direction.x:F2}, HurtY: {direction.y:F2}");
+        }
+
+        // Ждем завершения анимации
+        float waitTime = hurtAnimationDuration / hurtAnimationSpeed;
+        Debug.Log($"Waiting for {waitTime} seconds");
+        yield return new WaitForSeconds(waitTime);
+
+        // Выключаем bool параметр для выхода из состояния Hurt
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool(hurtBoolParameter, false);
+            Debug.Log($"Set {hurtBoolParameter} = false");
+        }
+
+        // Разблокируем клавиши WASD
+        UnblockWASD();
+
+        // Сбрасываем состояние
+        isHurting = false;
+        hurtCoroutine = null;
+        Debug.Log($"PlayHurtAnimation finished. isHurting: {isHurting}");
+    }
+
+    //==============================================================
+    // Тестирование анимаций урона (8 направлений)
+    //==============================================================
+    private void TestHurtAnimations()
+    {
+        // Тестируем 8 основных направлений
+        if (Input.GetKeyDown(KeyCode.Alpha1)) TestHurtDirection(new Vector2(0, -1));  // Down
+        if (Input.GetKeyDown(KeyCode.Alpha2)) TestHurtDirection(new Vector2(-1, 0));  // Left
+        if (Input.GetKeyDown(KeyCode.Alpha3)) TestHurtDirection(new Vector2(-0.7f, -0.7f)); // Left-Down
+        if (Input.GetKeyDown(KeyCode.Alpha4)) TestHurtDirection(new Vector2(-0.7f, 0.7f));  // Left-Up
+        if (Input.GetKeyDown(KeyCode.Alpha5)) TestHurtDirection(new Vector2(1, 0));   // Right
+        if (Input.GetKeyDown(KeyCode.Alpha6)) TestHurtDirection(new Vector2(0.7f, -0.7f)); // Right-Down
+        if (Input.GetKeyDown(KeyCode.Alpha7)) TestHurtDirection(new Vector2(0.7f, 0.7f));  // Right-Up
+        if (Input.GetKeyDown(KeyCode.Alpha8)) TestHurtDirection(new Vector2(0, 1));   // Up
+    }
+
+    private void TestHurtDirection(Vector2 direction)
+    {
+        if (playerAnimator != null && !isDead)
+        {
+            // Останавливаем предыдущую корутину
+            if (hurtCoroutine != null)
+            {
+                StopCoroutine(hurtCoroutine);
+                isHurting = false;
+                playerAnimator.SetBool(hurtBoolParameter, false);
+                UnblockWASD(); // Разблокируем движение на всякий случай
+            }
+
+            // Устанавливаем параметры направления
+            playerAnimator.SetFloat(hurtHorizontalParameter, direction.x);
+            playerAnimator.SetFloat(hurtVerticalParameter, direction.y);
+
+            // Запускаем тестовую анимацию
+            hurtCoroutine = StartCoroutine(TestHurtAnimation(direction));
+        }
+    }
+
+    private IEnumerator TestHurtAnimation(Vector2 direction)
+    {
+        isHurting = true;
+
+        // Блокируем клавиши WASD для теста
+        BlockWASD();
+
+        // Включаем bool параметр
+        playerAnimator.SetBool(hurtBoolParameter, true);
+
+        Debug.Log($"Testing hurt animation with direction: ({direction.x:F2}, {direction.y:F2})");
+
+        // Ждем завершения анимации
+        yield return new WaitForSeconds(hurtAnimationDuration / hurtAnimationSpeed);
+
+        // Выключаем bool параметр
+        playerAnimator.SetBool(hurtBoolParameter, false);
+
+        // Разблокируем клавиши WASD
+        UnblockWASD();
+
+        isHurting = false;
+        hurtCoroutine = null;
+    }
+
+    //==============================================================
+    // Play Specific Death Animation (оставляем старый метод для совместимости)
+    //==============================================================
+    private void PlayDeathAnimation()
+    {
+        if (playerAnimator == null)
+        {
+            Debug.LogWarning("Player Animator is not assigned!");
+            return;
+        }
+
+        // Получаем текущее направление
+        Vector2 direction = GetCurrentAnimationDirection();
+
+        // Конвертируем направление в индекс (0-7) для анимации смерти
+        int directionIndex = DirectionToIndex(direction);
+
+        // Устанавливаем параметр направления
+        playerAnimator.SetInteger(deathDirectionParameter, directionIndex);
+
+        // Активируем триггер смерти
+        playerAnimator.SetTrigger(deathTrigger);
+
+        Debug.Log($"Triggering death animation with direction index: {directionIndex}");
+    }
+
+    //==============================================================
+    // Convert direction vector to index для смерти (если нужно)
     //==============================================================
     private int DirectionToIndex(Vector2 direction)
     {
         if (direction.magnitude < 0.1f)
         {
-            Debug.Log("Direction magnitude is too small, using default (Down)");
             return 0; // Down как значение по умолчанию
         }
 
@@ -370,10 +667,7 @@ public class HealthSystem : MonoBehaviour
         // Нормализуем угол от 0 до 360
         angle = (angle + 360) % 360;
 
-        Debug.Log($"Direction angle: {angle}°");
-
         // Разделяем на 8 направлений (по 45 градусов)
-        // Сопоставление должно соответствовать вашим анимациям смерти
         if (angle >= 337.5f || angle < 22.5f)
             return 4; // Right
         else if (angle >= 22.5f && angle < 67.5f)
@@ -395,66 +689,57 @@ public class HealthSystem : MonoBehaviour
     }
 
     //==============================================================
-    // Play Specific Death Animation
-    //==============================================================
-    private void PlayDeathAnimation()
-    {
-        if (playerAnimator == null)
-        {
-            Debug.LogWarning("Player Animator is not assigned!");
-            return;
-        }
-
-        int directionIndex = GetDeathDirectionIndex();
-
-        // Устанавливаем параметр направления
-        playerAnimator.SetInteger(deathDirectionParameter, directionIndex);
-
-        // Активируем триггер смерти
-        playerAnimator.SetTrigger(deathTrigger);
-
-        Debug.Log($"Triggering death animation with direction: {directionIndex}");
-    }
-
-    //==============================================================
-    // TEST METHOD - Force test all directions
-    //==============================================================
-    private void TestAllDirections()
-    {
-        if (Input.GetKeyDown(KeyCode.F1)) StartCoroutine(TestDirectionSequence());
-    }
-
-    private IEnumerator TestDirectionSequence()
-    {
-        Debug.Log("=== STARTING DIRECTION TEST SEQUENCE ===");
-
-        for (int i = 0; i < 8; i++)
-        {
-            if (playerAnimator != null)
-            {
-                // Сбрасываем триггер
-                playerAnimator.ResetTrigger(deathTrigger);
-
-                // Устанавливаем направление
-                playerAnimator.SetInteger(deathDirectionParameter, i);
-
-                // Активируем триггер
-                playerAnimator.SetTrigger(deathTrigger);
-
-                Debug.Log($"Testing direction {i}");
-                yield return new WaitForSeconds(1.5f);
-            }
-        }
-    }
-
-    //==============================================================
     // Reset Player State
     //==============================================================
     public void RespawnPlayer()
     {
         isDead = false;
+        isHurting = false;
+        blockWASD = false;
         hitPoint = maxHitPoint;
         manaPoint = maxManaPoint;
+
+        // Останавливаем корутину урона
+        if (hurtCoroutine != null)
+        {
+            StopCoroutine(hurtCoroutine);
+            hurtCoroutine = null;
+        }
+
+        // Выключаем bool параметр урона в аниматоре
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool(hurtBoolParameter, false);
+            playerAnimator.SetFloat(hurtHorizontalParameter, 0);
+            playerAnimator.SetFloat(hurtVerticalParameter, 0);
+            playerAnimator.ResetTrigger(deathTrigger);
+        }
+
+        // Разблокируем движение
+        UnblockWASD();
+
+        // Включаем коллайдеры
+        Collider2D collider = GetComponent<Collider2D>();
+        if (collider != null)
+        {
+            collider.enabled = true;
+        }
+
+        // Включаем Rigidbody
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.constraints = originalConstraints;
+        }
+
+        // Включаем управление через PlayerCombatSystem
+        PlayerCombatSystem combatSystem = GetComponent<PlayerCombatSystem>();
+        if (combatSystem != null)
+        {
+            combatSystem.enabled = true; // Включаем скрипт
+            combatSystem.SetDeadState(false);
+        }
 
         if (playerAnimator != null)
         {
@@ -477,13 +762,6 @@ public class HealthSystem : MonoBehaviour
             Vector2 direction = GetCurrentAnimationDirection();
             Gizmos.color = Color.red;
             Gizmos.DrawRay(transform.position, direction * 2f);
-
-            // Подпись с координатами
-#if UNITY_EDITOR
-            int directionIndex = GetDeathDirectionIndex();
-            UnityEditor.Handles.Label(transform.position + Vector3.up * 2f,
-                $"Dir: {directionIndex} ({direction.x:F2}, {direction.y:F2})");
-#endif
         }
     }
 
@@ -501,12 +779,17 @@ public class HealthSystem : MonoBehaviour
             Debug.Log("Ouch! -10 HP");
         }
 
+        // Ждем завершения анимации урона если она есть
+        if (isHurting)
+        {
+            yield return new WaitForSeconds(hurtAnimationDuration / hurtAnimationSpeed);
+        }
+
+        // Проверяем смерть только после анимации урона
         if (hitPoint < 1)
         {
             yield return StartCoroutine(PlayerDied());
         }
-        else
-            yield return null;
     }
 
     //==============================================================
@@ -516,6 +799,26 @@ public class HealthSystem : MonoBehaviour
     {
         if (isDead) yield break;
         isDead = true;
+
+        // Останавливаем анимацию урона если активна
+        if (hurtCoroutine != null)
+        {
+            StopCoroutine(hurtCoroutine);
+            hurtCoroutine = null;
+            isHurting = false;
+        }
+
+        // Выключаем bool параметр урона в аниматоре
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool(hurtBoolParameter, false);
+        }
+
+        // Блокируем WASD при смерти
+        blockWASD = true;
+
+        // Вызываем событие смерти
+        OnPlayerDeath?.Invoke();
 
         PlayDeathAnimation();
 
@@ -528,6 +831,68 @@ public class HealthSystem : MonoBehaviour
             Debug.Log("You have died!");
         }
 
+        // Отключаем управление
+        DisablePlayerControls();
+
         yield return new WaitForSeconds(2f);
+    }
+
+    void DisablePlayerControls()
+    {
+        // Получаем PlayerCombatSystem и отключаем его
+        PlayerCombatSystem combatSystem = GetComponent<PlayerCombatSystem>();
+        if (combatSystem != null)
+        {
+            combatSystem.SetDeadState(true);
+            combatSystem.enabled = false; // Отключаем скрипт движения
+        }
+
+        // Получаем PlayerShieldSystem и отключаем его
+        PlayerShieldSystem shieldSystem = GetComponent<PlayerShieldSystem>();
+        if (shieldSystem != null)
+        {
+            shieldSystem.enabled = false;
+        }
+
+        // Отключаем коллайдеры
+        Collider2D collider = GetComponent<Collider2D>();
+        if (collider != null)
+        {
+            collider.enabled = false;
+        }
+
+        // Отключаем Rigidbody
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.isKinematic = true;
+        }
+    }
+
+    public bool IsDead()
+    {
+        return isDead;
+    }
+
+    public bool IsHurting()
+    {
+        return isHurting;
+    }
+
+
+
+    //==============================================================
+    // Public method to adjust hurt animation speed
+    //==============================================================
+    public void SetHurtAnimationSpeed(float speed)
+    {
+        hurtAnimationSpeed = Mathf.Clamp(speed, 0.5f, 3f); // Ограничиваем скорость
+        SetHurtAnimationSpeed();
+    }
+
+    public void SetHurtAnimationDuration(float duration)
+    {
+        hurtAnimationDuration = Mathf.Clamp(duration, 0.5f, 5f); // Ограничиваем длительность
     }
 }

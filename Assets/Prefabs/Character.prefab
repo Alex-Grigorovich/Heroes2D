@@ -201,7 +201,7 @@ Transform:
   m_GameObject: {fileID: 4530784739262083666}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 387, y: 0, z: 0}
+  m_LocalPosition: {x: 387.13, y: 0, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -275,6 +275,8 @@ MonoBehaviour:
   _targetZoneDistance: 0.7
   _targetZoneShowDuration: 0.8
   _targetZoneRadius: 0.5
+  _disableOnDeath: 1
+  _stopMovementOnDeath: 1
 --- !u!114 &5668739975071248169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,6 +293,13 @@ MonoBehaviour:
   staminaRegenPerSecond: 8
   maxStamina: 100
   minStaminaToRaise: 10
+  restrictMovementWhenShielding: 1
+  movementSpeedMultiplier: 0
+  shieldPrefab: {fileID: 6131053822415618460, guid: 4b686a5211c7f694686b57d5028241bb, type: 3}
+  shieldSpawnPoint: {fileID: 0}
+  shieldOffset: 0.1
+  shieldScale: 0.6
+  destroyShieldOnLower: 1
   directionSmoothTime: 0.5
   deadZone: 0.1
   holdLastFrameDuration: 1
@@ -300,8 +309,10 @@ MonoBehaviour:
   useTriggerForAnimation: 1
   shieldTriggerName: ShieldRaise
   shieldStateName: Shield_Raise
+  attackCooldownAfterAnimation: 0.2
   animator: {fileID: 5904414318898432411}
   combatSystem: {fileID: 8768953311415886451}
+  playerRigidbody: {fileID: 0}
 --- !u!58 &4091292101536293907
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -386,6 +397,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9b55900b-2334-453a-a7c2-03dff9046919
     m_ActionName: Player/Drop[/Mouse/rightButton,/XInputControllerWindows/buttonWest]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d3893f83-48c4-480a-8a05-219b416045a4
+    m_ActionName: Player/Look
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -536,6 +551,10 @@ PrefabInstance:
       propertyPath: playerAnimator
       value: 
       objectReference: {fileID: 5904414318898432411}
+    - target: {fileID: 5510382441765092197, guid: f7162b84863baba4bafb2589864e6802, type: 3}
+      propertyPath: hurtAnimationDuration
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5510382441765092198, guid: f7162b84863baba4bafb2589864e6802, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
