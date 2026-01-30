@@ -877,7 +877,7 @@ public class HealthSystem : MonoBehaviour
 
     public bool IsHurting()
     {
-        return isHurting;
+        return isHurting; // Просто возвращаем значение без логов
     }
 
 

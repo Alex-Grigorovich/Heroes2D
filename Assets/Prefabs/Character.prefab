@@ -277,6 +277,19 @@ MonoBehaviour:
   _targetZoneRadius: 0.5
   _disableOnDeath: 1
   _stopMovementOnDeath: 1
+  _rollSpeed: 10
+  _rollDuration: 0.4
+  _rollCooldown: 0.8
+  _isRollInvincible: 1
+  _invincibilityDuration: 0.3
+  _rollStaminaCost: 20
+  _rollKey: 32
+  _allowMovementDuringRoll: 0
+  _rollBlendTreeParameter: IsRolling
+  _rollHorizontalParameter: RollX
+  _rollVerticalParameter: RollY
+  _rollAnimationSpeed: 1.5
+  _showDebugLogs: 1
 --- !u!114 &5668739975071248169
 MonoBehaviour:
   m_ObjectHideFlags: 0

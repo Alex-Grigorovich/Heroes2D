@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
+
 
 public class PlayerCombatSystem : MonoBehaviour
 {
@@ -45,6 +47,25 @@ public class PlayerCombatSystem : MonoBehaviour
     [SerializeField] private bool _disableOnDeath = true;
     [SerializeField] private bool _stopMovementOnDeath = true;
 
+
+    [Header("Dodge Roll Settings")]
+    [SerializeField] private float _rollSpeed = 4f;
+    [SerializeField] private float _rollDuration = 1.2f;
+    [SerializeField] private float _rollCooldown = 0.8f;
+    [SerializeField] private bool _isRollInvincible = true;
+    [SerializeField] private float _invincibilityDuration = 0.3f;
+    [SerializeField] private float _rollStaminaCost = 20f;
+    [SerializeField] private KeyCode _rollKey = KeyCode.Space;
+    [SerializeField] private bool _allowMovementDuringRoll = false;
+
+    [Header("Roll Animation")]
+    [SerializeField] private string _rollBlendTreeParameter = "IsRolling";   // ← БЕЗ ПРОБЕЛА!
+    [SerializeField] private string _rollHorizontalParameter = "RollX";     // ← БЕЗ ПРОБЕЛА!
+    [SerializeField] private string _rollVerticalParameter = "RollY";       // ← БЕЗ ПРОБЕЛА!
+    [SerializeField] private float _rollAnimationSpeed = 1.5f;
+
+
+
     // Компоненты
     private Rigidbody2D _rigidbody;
     private Animator _animator;
@@ -83,6 +104,26 @@ public class PlayerCombatSystem : MonoBehaviour
     public event Action OnAttackStarted;
     public event Action OnAttackFinished;
 
+
+
+    // События для переката
+    public event Action OnRollStarted;
+    public event Action OnRollFinished;
+
+    // Состояние переката
+    private bool _isRolling = false;
+    private bool _canRoll = true;
+    private float _currentRollCooldown = 0f;
+    private Vector2 _rollDirection;
+    private Coroutine _rollCoroutine;
+    private bool _isInvincible = false;
+
+    private bool _pendingRollRequest = false;
+
+
+    [Header("Debug")]
+    [SerializeField] private bool _showDebugLogs = true;
+
     // Свойство для доступа из других систем
     public bool IsAttacking => _isAttacking;
 
@@ -92,6 +133,8 @@ public class PlayerCombatSystem : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody2D>();
         _mainCamera = Camera.main;
         _playerSpriteRenderer = GetComponent<SpriteRenderer>();
+
+        CheckRollAnimationsExist();
 
         if (_playerSpriteRenderer != null)
         {
@@ -111,10 +154,38 @@ public class PlayerCombatSystem : MonoBehaviour
             _targetingReticle = Instantiate(_targetingReticlePrefab);
             _targetingReticle.SetActive(false);
         }
+
+
+        _canRoll = true;
+
+        // Настройка аниматора
+        if (_animator != null)
+        {
+            _animator.SetFloat("RollSpeed", _rollAnimationSpeed);
+            // Инициализируем параметры переката
+            _animator.SetFloat(_rollHorizontalParameter, 0);
+            _animator.SetFloat(_rollVerticalParameter, 1); // Направление вверх по умолчанию
+            _animator.SetBool(_rollBlendTreeParameter, false);
+
+            if (_showDebugLogs)
+                Debug.Log($"✅ Animator initialized: RollX={_rollHorizontalParameter}, RollY={_rollVerticalParameter}, IsRolling={_rollBlendTreeParameter}");
+        }
+        else
+        {
+            Debug.LogError("❌ Animator not found! Make sure Animator component is attached to the player.");
+        }
+
+
     }
 
     private void Update()
     {
+        // ТЕСТ: Проверяем, регистрируется ли нажатие пробела
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log($"🎮 SPACE pressed in Update() - canRoll: {_canRoll}, cooldown: {_currentRollCooldown:F2}, isRolling: {_isRolling}");
+        }
+
         // Проверяем, заблокировано ли движение
         if (IsMovementBlocked())
         {
@@ -139,37 +210,37 @@ public class PlayerCombatSystem : MonoBehaviour
         // Проверяем состояние смерти
         CheckDeathState();
 
-        // Проверяем состояние урона
-        bool isHurting = false;
-        if (_healthSystem != null)
-        {
-            isHurting = _healthSystem.IsHurting();
-        }
-
-        // Если персонаж мертв, движение заморожено или получает урон - отключаем управление
-        if (_isDead || _movementFrozen || isHurting)
+        // Если персонаж мертв или движение заморожено - отключаем управление
+        if (_isDead || _movementFrozen)
         {
             DisableMovement();
-
-            // Если получаем урон, прерываем атаку
-            if (isHurting && _isAttacking)
-            {
-                EndAttack();
-            }
-
             return;
         }
 
+        // Сначала обновляем ввод и таргетинг
         UpdateMousePosition();
         UpdateTargeting();
         UpdateCooldowns();
+
+        // Затем обрабатываем перекат
+        UpdateRoll();
+
+        // Затем атаку
         HandleAttackInput();
+
+        // И наконец анимацию
         UpdateAnimation();
         UpdateTargetingReticle();
 
         if (_isDealingDamage && _targetZoneInstance != null)
         {
             CheckTargetZoneDamage();
+        }
+
+        // Отладка аниматора (можно включить по клавише)
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            DebugAnimatorParameters();
         }
     }
 
@@ -180,8 +251,8 @@ public class PlayerCombatSystem : MonoBehaviour
     {
         return HealthSystem.Instance != null &&
                (HealthSystem.Instance.IsDead() ||
-                HealthSystem.Instance.IsHurting() ||  // Уже есть
                 IsMovementFrozenByHealthSystem());
+        // Убрал HealthSystem.Instance.IsHurting() из проверки
     }
 
     private bool IsMovementFrozenByHealthSystem()
@@ -305,7 +376,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void UpdateMousePosition()
     {
-        if (_isDead || _movementFrozen) return;
+        // ДОБАВЬТЕ _isRolling
+        if (_isDead || _movementFrozen || _isRolling) return;
 
         Vector3 mouseScreenPos = Input.mousePosition;
         mouseScreenPos.z = -_mainCamera.transform.position.z;
@@ -314,7 +386,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void UpdateTargeting()
     {
-        if (_isDead || _movementFrozen) return;
+        // ДОБАВЬТЕ _isRolling
+        if (_isDead || _movementFrozen || _isRolling) return;
 
         if (_autoTargetClosestEnemy)
         {
@@ -325,6 +398,8 @@ public class PlayerCombatSystem : MonoBehaviour
             _attackDirection = (_mouseWorldPosition - (Vector2)transform.position).normalized;
         }
     }
+
+
 
     private void FindBestTarget()
     {
@@ -395,7 +470,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     private void HandleAttackInput()
     {
-        if (_isDead || _movementFrozen) return;
+        // ДОБАВЬТЕ _isRolling
+        if (_isDead || _movementFrozen || _isRolling) return;
 
         if (Input.GetMouseButtonDown(0) && CanAttack())
         {
@@ -447,6 +523,23 @@ public class PlayerCombatSystem : MonoBehaviour
         {
             Debug.LogWarning("❌ TargetZone prefab is not assigned!");
         }
+
+
+        var trigger = _targetZoneInstance.GetComponent<TargetZoneTrigger>();
+        if (trigger != null)
+        {
+            trigger.OnEnemyEnter = (collider) =>
+            {
+                if (_isDealingDamage && !_alreadyDamagedEnemies.Contains(collider.gameObject))
+                {
+                    if (CheckHitChance(collider.gameObject))
+                    {
+                        DealSingleDamage(collider.gameObject);
+                        _alreadyDamagedEnemies.Add(collider.gameObject);
+                    }
+                }
+            };
+        }
     }
 
     private void DestroyTargetZone()
@@ -468,6 +561,7 @@ public class PlayerCombatSystem : MonoBehaviour
             yield break;
         }
 
+        // Фаза подготовки (без урона и без зоны!)
         yield return new WaitForSeconds(_attackDuration * 0.2f);
 
         if (_isDead || _movementFrozen)
@@ -476,23 +570,29 @@ public class PlayerCombatSystem : MonoBehaviour
             yield break;
         }
 
+        // === НАЧАЛО ФАЗЫ УРОНА ===
         _isDealingDamage = true;
+        _alreadyDamagedEnemies.Clear(); // ← КРИТИЧЕСКИ ВАЖНО!
+        CreateTargetZone();             // ← Создаём зону ТОЛЬКО ЗДЕСЬ
         Debug.Log("💥 START dealing damage phase");
 
-        yield return new WaitForSeconds(_attackDuration * 0.4f);
+        // Проверяем врагов КАЖДЫЙ КАДР в течение 0.4 сек
+        float damagePhaseTime = 0f;
+        float damagePhaseDuration = _attackDuration * 0.4f;
 
-        if (_isDead || _movementFrozen)
+        while (damagePhaseTime < damagePhaseDuration && !_isDead && !_movementFrozen)
         {
-            _isDealingDamage = false;
-            EndAttack();
-            yield break;
+            CheckTargetZoneDamage(); // ← Проверяем КАЖДЫЙ КАДР
+            damagePhaseTime += Time.deltaTime;
+            yield return null;
         }
 
+        // === КОНЕЦ ФАЗЫ УРОНА ===
         _isDealingDamage = false;
+        DestroyTargetZone();
         Debug.Log("💥 END dealing damage phase");
 
-        DestroyTargetZone();
-
+        // Фаза завершения
         yield return new WaitForSeconds(_attackDuration * 0.4f);
 
         if (!_isDead && !_movementFrozen)
@@ -531,7 +631,7 @@ public class PlayerCombatSystem : MonoBehaviour
     // Метод для вызова из системы здоровья
     public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce = 0f)
     {
-        if (_isDead || _movementFrozen)
+        if (_isDead || _movementFrozen || _isInvincible)
         {
             Debug.Log("Персонаж мертв или движение заморожено, урон не принимается");
             return;
@@ -681,6 +781,7 @@ public class PlayerCombatSystem : MonoBehaviour
             if (_animator != null)
             {
                 _animator.SetFloat("Speed", 0f);
+                _animator.SetBool(_rollBlendTreeParameter, false);
             }
             return;
         }
@@ -692,18 +793,33 @@ public class PlayerCombatSystem : MonoBehaviour
             isHurting = _healthSystem.IsHurting();
         }
 
-        // ПРИОРИТЕТ: Урон > Атака > Движение > Наведение
+        // ПРИОРИТЕТ 1: Урон
         if (isHurting)
         {
-            // Во время получения урона - не обновляем анимацию
-            // HealthSystem уже управляет аниматором через свои параметры
             if (_animator != null)
             {
-                _animator.SetFloat("Speed", 0f); // Останавливаем движение
-                _animator.SetBool("IsAttacking", false); // Отменяем атаку
+                _animator.SetFloat("Speed", 0f);
+                _animator.SetBool("IsAttacking", false);
+                _animator.SetBool(_rollBlendTreeParameter, false);
             }
             return;
         }
+
+        if (_isRolling)
+        {
+            // ПРИОРИТЕТ: Перекат всегда выше урона
+            if (_animator != null)
+            {
+                _animator.SetFloat(_rollHorizontalParameter, _rollDirection.x);
+                _animator.SetFloat(_rollVerticalParameter, _rollDirection.y);
+                _animator.SetBool(_rollBlendTreeParameter, true);
+                _animator.SetFloat("Speed", 0f);
+                _animator.SetBool("IsAttacking", false);
+            }
+            return; // ← Выходим здесь, даже если isHurting == true
+        }
+
+
         else if (_isAttacking)
         {
             // Во время атаки - только направление атаки
@@ -724,6 +840,7 @@ public class PlayerCombatSystem : MonoBehaviour
                 _animator.SetFloat("Vertical", _moveInput.normalized.y);
                 _animator.SetFloat("Speed", _moveInput.magnitude);
                 _animator.SetBool("IsAttacking", false);
+                _animator.SetBool(_rollBlendTreeParameter, false); // Гарантируем выключение переката
             }
         }
         else
@@ -736,20 +853,15 @@ public class PlayerCombatSystem : MonoBehaviour
                 _animator.SetFloat("Vertical", lookDirection.y);
                 _animator.SetFloat("Speed", 0f);
                 _animator.SetBool("IsAttacking", false);
+                _animator.SetBool(_rollBlendTreeParameter, false); // Гарантируем выключение переката
             }
         }
     }
 
     private void FixedUpdate()
     {
-        // Проверяем состояние урона
-        bool isHurting = false;
-        if (_healthSystem != null)
-        {
-            isHurting = _healthSystem.IsHurting();
-        }
-
-        if (_isDead || _movementFrozen || isHurting)
+        // Проверяем состояние смерти
+        if (_isDead || _movementFrozen)
         {
             if (_rigidbody != null)
             {
@@ -758,11 +870,14 @@ public class PlayerCombatSystem : MonoBehaviour
             return;
         }
 
-        if (!_isAttacking)
+        // ЕСЛИ КАТИМСЯ - ПОЛНОСТЬЮ КОНТРОЛИРУЕМ ДВИЖЕНИЕ ЧЕРЕЗ КОРУТИНУ
+        if (_isRolling)
         {
-            Move();
+            // Ничего не делаем здесь - движение полностью контролируется в RollSequence()
+            return;
         }
-        else
+        // ЕСЛИ АТАКУЕМ - БЛОКИРУЕМ ДВИЖЕНИЕ
+        else if (_isAttacking)
         {
             _velocity = Vector2.zero;
             if (_rigidbody != null)
@@ -770,7 +885,13 @@ public class PlayerCombatSystem : MonoBehaviour
                 _rigidbody.velocity = Vector2.zero;
             }
         }
+        // ОБЫЧНОЕ ДВИЖЕНИЕ
+        else
+        {
+            Move();
+        }
     }
+
 
     private void Move()
     {
@@ -796,7 +917,8 @@ public class PlayerCombatSystem : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (_isDead || _movementFrozen || !enabled)
+        // Если катимся - ИГНОРИРУЕМ ввод движения
+        if (_isDead || _movementFrozen || !enabled || _isRolling)
         {
             _moveInput = Vector2.zero;
             return;
@@ -807,11 +929,22 @@ public class PlayerCombatSystem : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        if (_isDead || _movementFrozen || !enabled) return;
+        if (_isDead || _movementFrozen || !enabled || _isRolling) return;
 
         if (context.performed && CanAttack())
         {
             StartAttack();
+        }
+    }
+
+    // Добавляем метод для Input System переката (если используете новый Input System):
+    public void OnRoll(InputAction.CallbackContext context)
+    {
+        if (_isDead || _movementFrozen || !enabled) return;
+
+        if (context.performed && CanRoll())
+        {
+            StartRoll();
         }
     }
 
@@ -842,6 +975,11 @@ public class PlayerCombatSystem : MonoBehaviour
             if (_isAttacking)
             {
                 EndAttack();
+            }
+
+            if (_isRolling)
+            {
+                EndRoll();
             }
 
             Debug.Log("Player movement frozen");
@@ -905,6 +1043,14 @@ public class PlayerCombatSystem : MonoBehaviour
             Gizmos.DrawWireSphere(_targetZoneInstance.transform.position, 0.1f);
             Gizmos.DrawLine(transform.position, _targetZoneInstance.transform.position);
         }
+
+
+        if (Application.isPlaying && _isRolling)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3)_rollDirection * 2f);
+            Gizmos.DrawWireSphere(transform.position + (Vector3)_rollDirection * 1.5f, 0.2f);
+        }
     }
 
     private void DrawAttackAngleGizmo()
@@ -926,6 +1072,462 @@ public class PlayerCombatSystem : MonoBehaviour
         Gizmos.DrawLine(transform.position + (Vector3)leftDir * _attackRadius,
                         transform.position + (Vector3)rightDir * _attackRadius);
     }
+
+
+
+
+    private void UpdateRoll()
+    {
+        if (_isDead || _movementFrozen || _isAttacking)
+            return;
+
+        // 🔑 ГАРАНТИРУЕМ: если кулдаун ≤ 0, то _canRoll = true
+        if (_currentRollCooldown <= 0f)
+        {
+            _canRoll = true;
+            _currentRollCooldown = 0f; // нормализуем
+        }
+        else
+        {
+            _currentRollCooldown -= Time.deltaTime;
+            if (_currentRollCooldown <= 0f)
+            {
+                _canRoll = true;
+                _currentRollCooldown = 0f;
+                if (_showDebugLogs)
+                    Debug.Log("✅ Roll cooldown finished, canRoll set to true");
+            }
+        }
+
+        // Обработка ввода
+        if (Input.GetKeyDown(_rollKey))
+        {
+            if (_showDebugLogs)
+                Debug.Log($"🎮 Roll key pressed: {_rollKey}");
+
+            if (CanRoll())
+            {
+                StartRoll();
+            }
+            else if (_showDebugLogs)
+            {
+                Debug.Log($"❌ Cannot roll now (CanRoll returned false)");
+            }
+        }
+    }
+
+
+    private bool CanRoll()
+    {
+        // Базовые проверки
+        if (_isDead || _movementFrozen || _isAttacking || _isRolling)
+        {
+            if (_showDebugLogs)
+                Debug.Log($"❌ CanRoll false: dead={_isDead}, frozen={_movementFrozen}, attacking={_isAttacking}, rolling={_isRolling}");
+            return false;
+        }
+
+        // Проверяем кулдаун
+        if (!_canRoll || _currentRollCooldown > 0f)
+        {
+            if (_showDebugLogs)
+                Debug.Log($"❌ CanRoll false: canRoll={_canRoll}, cooldown={_currentRollCooldown:F2}");
+            return false;
+        }
+
+        // УБРАТЬ проверку на isHurting - перекат должен быть доступен во время получения урона
+        // HealthSystem.Instance.IsHurting() - УБРАТЬ ЭТУ ПРОВЕРКУ
+
+        return true;
+    }
+
+    private void StartRoll()
+    {
+        if (_isDead || _movementFrozen || _isAttacking || !CanRoll())
+        {
+            return;
+        }
+
+        if (_isRolling) return;
+
+        _isRolling = true;
+        _canRoll = false;
+
+        Vector2 rawDirection = GetRollDirection();
+        _rollDirection = GetRoundedDirection(rawDirection);
+
+        if (_showDebugLogs)
+        {
+            Debug.Log($"🔄 Roll direction: Raw=({rawDirection.x:F2}, {rawDirection.y:F2}), Rounded=({_rollDirection.x:F2}, {_rollDirection.y:F2})");
+        }
+
+        // 🔥 КРИТИЧЕСКАЯ ПРОВЕРКА: существуют ли параметры?
+        if (_animator != null)
+        {
+            bool HasParameter(string paramName)
+            {
+                foreach (var param in _animator.parameters)
+                {
+                    if (param.name == paramName)
+                        return true;
+                }
+                return false;
+            }
+
+            bool hasIsRolling = HasParameter(_rollBlendTreeParameter);
+            bool hasRollX = HasParameter(_rollHorizontalParameter);
+            bool hasRollY = HasParameter(_rollVerticalParameter);
+
+            if (!hasIsRolling || !hasRollX || !hasRollY)
+            {
+                Debug.LogError($"❌ Animator parameters NOT FOUND! IsRolling={hasIsRolling}, RollX={hasRollX}, RollY={hasRollY}\n" +
+                              $"Check names in Animator and in script (no trailing spaces!)");
+                return;
+            }
+
+            // Сброс и установка — теперь будет работать
+            _animator.SetBool(_rollBlendTreeParameter, false);
+            _animator.SetFloat(_rollHorizontalParameter, 0);
+            _animator.SetFloat(_rollVerticalParameter, 0);
+            _animator.Update(0);
+
+            _animator.SetFloat(_rollHorizontalParameter, _rollDirection.x);
+            _animator.SetFloat(_rollVerticalParameter, _rollDirection.y);
+            _animator.SetBool(_rollBlendTreeParameter, true); // ← Теперь сработает!
+            _animator.Update(0);
+        }
+
+        OnRollStarted?.Invoke();
+        if (_isRollInvincible) StartCoroutine(ApplyInvincibility());
+        _rollCoroutine = StartCoroutine(RollSequence());
+    }
+
+
+    // Добавьте этот метод для отладки названий направлений:
+    private string GetDirectionName(Vector2 direction)
+    {
+        Vector2 rounded = GetRoundedDirection(direction);
+
+        if (rounded == Vector2.right) return "Right";
+        if (rounded == Vector2.left) return "Left";
+        if (rounded == Vector2.up) return "Up";
+        if (rounded == Vector2.down) return "Down";
+        if (rounded == new Vector2(0.7f, 0.7f)) return "Up-Right";
+        if (rounded == new Vector2(-0.7f, 0.7f)) return "Up-Left";
+        if (rounded == new Vector2(0.7f, -0.7f)) return "Down-Right";
+        if (rounded == new Vector2(-0.7f, -0.7f)) return "Down-Left";
+
+        return $"Unknown: ({direction.x:F2}, {direction.y:F2})";
+    }
+
+
+    private Vector2 GetRollDirection()
+    {
+        Vector2 direction = Vector2.zero;
+
+        // Читаем нажатые клавиши WASD напрямую
+        bool up = Input.GetKey(KeyCode.W);
+        bool down = Input.GetKey(KeyCode.S);
+        bool left = Input.GetKey(KeyCode.A);
+        bool right = Input.GetKey(KeyCode.D);
+
+        // Собираем направление
+        if (up) direction.y += 1;
+        if (down) direction.y -= 1;
+        if (left) direction.x -= 1;
+        if (right) direction.x += 1;
+
+        // Если нет ввода — используем мышь как fallback
+        if (direction == Vector2.zero)
+        {
+            Vector2 mouseDir = (_mouseWorldPosition - (Vector2)transform.position).normalized;
+            if (mouseDir.magnitude > 0.1f)
+            {
+                direction = mouseDir;
+                if (_showDebugLogs)
+                    Debug.Log($"🎮 Using mouse direction: ({direction.x:F2}, {direction.y:F2})");
+            }
+            else
+            {
+                // Если и мышь неактивна — используем последнее направление атаки или вниз по умолчанию
+                if (_attackDirection.magnitude > 0.1f)
+                {
+                    direction = _attackDirection.normalized;
+                }
+                else
+                {
+                    direction = Vector2.down;
+                }
+            }
+        }
+
+        // Нормализуем только если не нулевой
+        if (direction.magnitude > 0.1f)
+        {
+            direction = direction.normalized;
+        }
+
+        if (_showDebugLogs)
+            Debug.Log($"🎮 Raw roll input from keys: W={Input.GetKey(KeyCode.W)}, A={Input.GetKey(KeyCode.A)}, S={Input.GetKey(KeyCode.S)}, D={Input.GetKey(KeyCode.D)} → Direction: ({direction.x:F2}, {direction.y:F2})");
+
+        return direction;
+    }
+
+  
+
+    private void DebugAnimatorParameters()
+    {
+        if (_animator != null && _showDebugLogs)
+        {
+            Debug.Log($"🎭 Animator Parameters:");
+            Debug.Log($"  - RollX: {_animator.GetFloat(_rollHorizontalParameter):F2}");
+            Debug.Log($"  - RollY: {_animator.GetFloat(_rollVerticalParameter):F2}");
+            Debug.Log($"  - IsRolling: {_animator.GetBool(_rollBlendTreeParameter)}");
+            Debug.Log($"  - Speed: {_animator.GetFloat("Speed"):F2}");
+            Debug.Log($"  - Horizontal: {_animator.GetFloat("Horizontal"):F2}");
+            Debug.Log($"  - Vertical: {_animator.GetFloat("Vertical"):F2}");
+
+            // Проверяем состояние анимации
+            AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+            Debug.Log($"  - Current state length: {stateInfo.length:F2}, normalized time: {stateInfo.normalizedTime:F2}");
+        }
+    }
+
+    private void CheckRollAnimationsExist()
+    {
+        if (_animator == null) return;
+
+        // Получаем контроллер аниматора
+        RuntimeAnimatorController controller = _animator.runtimeAnimatorController;
+
+        if (controller == null)
+        {
+            Debug.LogError("❌ Animator Controller не назначен!");
+            return;
+        }
+
+        Debug.Log($"📁 Animator Controller: {controller.name}");
+
+        // Проверяем все анимации в контроллере
+        foreach (AnimationClip clip in controller.animationClips)
+        {
+            if (clip.name.Contains("Roll") || clip.name.Contains("rolling", System.StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log($"✅ Found roll animation: {clip.name} (length: {clip.length:F2}s)");
+            }
+        }
+    }
+
+    private Vector2 GetRoundedDirection(Vector2 direction)
+    {
+        if (direction.magnitude < 0.1f)
+            return Vector2.down; // По умолчанию вниз
+
+        direction = direction.normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        angle = (angle + 360) % 360;
+
+        // Для 8 направлений (каждые 45 градусов)
+        if (angle >= 337.5f || angle < 22.5f)
+            return Vector2.right;           // Вправо (1, 0)
+        else if (angle >= 22.5f && angle < 67.5f)
+            return new Vector2(0.7f, 0.7f);   // Вверх-вправо
+        else if (angle >= 67.5f && angle < 112.5f)
+            return Vector2.up;               // Вверх (0, 1)
+        else if (angle >= 112.5f && angle < 157.5f)
+            return new Vector2(-0.7f, 0.7f);  // Вверх-влево
+        else if (angle >= 157.5f && angle < 202.5f)
+            return Vector2.left;             // Влево (-1, 0)
+        else if (angle >= 202.5f && angle < 247.5f)
+            return new Vector2(-0.7f, -0.7f); // Вниз-влево
+        else if (angle >= 247.5f && angle < 292.5f)
+            return Vector2.down;             // Вниз (0, -1)
+        else if (angle >= 292.5f && angle < 337.5f)
+            return new Vector2(0.7f, -0.7f);  // Вниз-вправо
+        else
+            return Vector2.down;
+    }
+
+    // Добавьте метод для логирования параметров аниматора:
+    private void LogAnimatorParameters()
+    {
+        if (_animator != null && _showDebugLogs)
+        {
+            Debug.Log($"🎭 Animator Params - RollX: {_animator.GetFloat(_rollHorizontalParameter):F2}, " +
+                      $"RollY: {_animator.GetFloat(_rollVerticalParameter):F2}, " +
+                      $"IsRolling: {_animator.GetBool(_rollBlendTreeParameter)}, " +
+                      $"Speed: {_animator.GetFloat("Speed"):F2}");
+        }
+    }
+
+    private IEnumerator RollSequence()
+    {
+        float elapsedTime = 0f;
+        Vector2 fixedDirection = _rollDirection;
+
+        // Блокируем ввод и физику
+        _moveInput = Vector2.zero;
+        if (_rigidbody != null) _rigidbody.velocity = Vector2.zero;
+
+        if (_showDebugLogs)
+            Debug.Log($"🔄 Roll started: dir=({fixedDirection.x:F2}, {fixedDirection.y:F2}), duration={_rollDuration}s");
+
+        while (elapsedTime < _rollDuration && !_isDead && !_movementFrozen)
+        {
+            // 🔥 Обновляем анимацию КАЖДЫЙ КАДР — даже если FPS низкий
+            if (_animator != null)
+            {
+                _animator.SetFloat(_rollHorizontalParameter, fixedDirection.x);
+                _animator.SetFloat(_rollVerticalParameter, fixedDirection.y);
+                _animator.SetBool(_rollBlendTreeParameter, true);
+                _animator.Update(0); // ← Это ключевой вызов!
+            }
+
+            // Движение через MovePosition (плавнее)
+            if (_rigidbody != null)
+            {
+                _rigidbody.MovePosition(_rigidbody.position + fixedDirection * _rollSpeed * Time.deltaTime);
+            }
+
+            elapsedTime += Time.deltaTime;
+            yield return null; // ← Не WaitForFixedUpdate!
+        }
+
+        EndRoll();
+    }
+
+    private void DebugRollDirection()
+    {
+        if (_animator != null && _showDebugLogs)
+        {
+            float rollX = _animator.GetFloat(_rollHorizontalParameter);
+            float rollY = _animator.GetFloat(_rollVerticalParameter);
+            bool isRolling = _animator.GetBool(_rollBlendTreeParameter);
+
+            Debug.Log($"🎭 Roll Animation Params | IsRolling: {isRolling} | RollX: {rollX:F2} | RollY: {rollY:F2} | Target: ({_rollDirection.x:F2}, {_rollDirection.y:F2})");
+        }
+    }
+
+    private IEnumerator ApplyInvincibility()
+    {
+        _isInvincible = true;
+
+        // Визуальный эффект неуязвимости (мигание)
+        if (_playerSpriteRenderer != null)
+        {
+            float flashInterval = 0.1f;
+            float elapsed = 0f;
+            Color originalColor = _playerSpriteRenderer.color;
+            Color invincibleColor = new Color(originalColor.r, originalColor.g, originalColor.b, 0.5f);
+
+            while (elapsed < _invincibilityDuration)
+            {
+                _playerSpriteRenderer.color = (_playerSpriteRenderer.color == originalColor) ? invincibleColor : originalColor;
+                yield return new WaitForSeconds(flashInterval);
+                elapsed += flashInterval;
+            }
+
+            _playerSpriteRenderer.color = originalColor;
+        }
+
+        _isInvincible = false;
+    }
+
+    public void EndRoll()
+    {
+
+        _isRolling = false;
+        _pendingRollRequest = false; // ← сбрасываем запрос при завершении
+
+        if (_isRolling)
+        {
+            _isRolling = false;
+
+            // Устанавливаем кулдаун
+            _currentRollCooldown = _rollCooldown;
+           // _canRoll = false; // ← пока кулдаун идёт — нельзя кататься
+
+            // Сбрасываем анимацию
+            if (_animator != null)
+            {
+                _animator.SetBool(_rollBlendTreeParameter, false);
+
+                // Сбрасываем параметры направления
+                _animator.SetFloat(_rollHorizontalParameter, 0);
+                _animator.SetFloat(_rollVerticalParameter, 0);
+
+                if (_showDebugLogs)
+                    Debug.Log($"🎭 EndRoll: Reset animation parameters");
+            }
+
+            // Вызываем событие
+            OnRollFinished?.Invoke();
+
+            // Очищаем корутину
+            if (_rollCoroutine != null)
+            {
+                StopCoroutine(_rollCoroutine);
+                _rollCoroutine = null;
+            }
+
+            if (_showDebugLogs)
+                Debug.Log($"✅ Roll finished, cooldown: {_rollCooldown}s, canRoll: {_canRoll}");
+        }
+    }
+
+    public void ResetRoll()
+    {
+        _isRolling = false;
+        _canRoll = true;
+        _currentRollCooldown = 0f;
+
+        if (_rollCoroutine != null)
+        {
+            StopCoroutine(_rollCoroutine);
+            _rollCoroutine = null;
+        }
+
+        if (_animator != null)
+        {
+            _animator.SetBool(_rollBlendTreeParameter, false);
+        }
+
+        Debug.Log($"🔄 Roll state reset");
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        // Визуализация округленного направления переката
+        if (Application.isPlaying && _isRolling)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3)_rollDirection * 1.5f);
+            Gizmos.DrawWireSphere(transform.position + (Vector3)_rollDirection * 1.5f, 0.1f);
+
+            // Также показываем неокругленное направление для сравнения
+            Vector2 rawDirection;
+            if (_moveInput.magnitude > 0.1f)
+            {
+                rawDirection = _moveInput.normalized;
+            }
+            else
+            {
+                rawDirection = (_mouseWorldPosition - (Vector2)transform.position).normalized;
+            }
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3)rawDirection * 1.2f);
+        }
+    }
+
+
+    // Метод для проверки неуязвимости (может использоваться другими системами)
+    public bool IsInvincible()
+    {
+        return _isInvincible;
+    }
+
 
 
 

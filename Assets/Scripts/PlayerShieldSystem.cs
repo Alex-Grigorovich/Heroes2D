@@ -342,9 +342,7 @@ public class PlayerShieldSystem : MonoBehaviour
 
     private bool IsMovementBlocked()
     {
-        return HealthSystem.Instance != null &&
-               (HealthSystem.Instance.IsDead() ||
-                HealthSystem.Instance.IsHurting());
+        return HealthSystem.Instance != null && HealthSystem.Instance.IsDead();
     }
 
     void StartShielding()
